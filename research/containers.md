@@ -11,6 +11,7 @@ Technologies Research
 
 - Container orchestration
 - Deploying & scaling containers
-
 - **Nodes** refer to host with compute resources
-- **Pods** are unit of deployment
+- **Pods** are unit of deployment, pods are run on nodes
+- Multiple containers per pod
+- Limit of ~100 pods per node
