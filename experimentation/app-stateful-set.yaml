@@ -1,9 +1,10 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: app-stateful-set
+  name: app
   namespace: default
 spec:
+  serviceName: app
   replicas: 3
   selector:
     matchLabels:
@@ -17,3 +18,11 @@ spec:
       containers:
         - name: app
           image: app:1.0
+          env:
+            - name: NUM_REPLICAS
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: replicas
+          command: ["python3"]
+          args: ["app.py", "3"]

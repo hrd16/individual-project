@@ -1,1 +1,1 @@
-kubectl apply -f app.yaml
+kubectl apply -f app-deployment.yaml
