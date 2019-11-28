@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: app-stateful-set
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      deploy: example
+  template:
+    metadata:
+      labels:
+        deploy: example
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: app
+          image: app:1.0
