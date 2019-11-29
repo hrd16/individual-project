@@ -7,9 +7,6 @@ metadata:
 spec:
   selector:
     app: app-service
-  ports:
-    - port: 4400
-      name: app-port
   clusterIP: None
 ---
 apiVersion: apps/v1
@@ -36,8 +33,5 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
-          ports:
-              - containerPort: 4400
-                name: app-port
           command: ["python3"]
           args: ["app.py", "3", "$(POD_IP)"]
