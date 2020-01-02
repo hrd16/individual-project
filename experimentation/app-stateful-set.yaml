@@ -16,6 +16,7 @@ metadata:
 spec:
   serviceName: app-service
   replicas: 3
+  podManagementPolicy: Parallel
   selector:
     matchLabels:
       app: app-service
