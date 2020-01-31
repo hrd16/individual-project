@@ -36,15 +36,3 @@ spec:
                   fieldPath: status.podIP
           command: ["python3"]
           args: ["app.py", "3", "$(POD_IP)"]
-          volumeMounts:
-            - name: dockercontainers
-              mountPath: /var/lib/docker/containers
-            - name: varlog
-              mountPath: /var/log
-      volumes:
-        - name: dockercontainers
-          hostPath: 
-            path: /var/lib/docker/containers
-        - name: varlog
-          hostPath: 
-            path: /var/log

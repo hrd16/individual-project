@@ -1,0 +1,1 @@
+docker build -t log-server:1.0 .
