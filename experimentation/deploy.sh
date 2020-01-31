@@ -1,1 +1,1 @@
-kubectl apply -f app-deployment.yaml
+kubectl apply -f app-stateful-set.yaml

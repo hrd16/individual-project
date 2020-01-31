@@ -1,1 +1,1 @@
-kubectl delete -f app-deployment.yaml
+kubectl delete -f app-stateful-set.yaml
