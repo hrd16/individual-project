@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: fluentdconf
+  name: fluentd-config
   namespace: kube-system
 data:
   fluent.conf: |
@@ -59,6 +59,9 @@ spec:
       containers:
       - name: fluentd
         image: fluent/fluentd-kubernetes-daemonset:v0.12-alpine-elasticsearch
+        env:
+        - name: FLUENT_UID
+          value: "0"
         resources:
           limits:
             memory: 200Mi
@@ -66,33 +69,36 @@ spec:
             cpu: 100m
             memory: 200Mi
         volumeMounts:
-        - name: fluentconfig
-          mountPath: /fluentd/etc/
         - name: varlog
           mountPath: /var/log
         - name: varlibdockercontainers
           mountPath: /var/lib/docker/containers
           readOnly: true
+        - name: config-path
+          mountPath: /fluentd/etc
       terminationGracePeriodSeconds: 30
       initContainers:
-        - name: copy-ro-scripts
+        - name: config-fluentd
           image: busybox
-          command: ['sh', '-c']
-          args: ['cp /tempconf/* /fluentd/etc/']
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c"]
+          args:
+          - cp /fluentd/etc2/fluent.conf /fluentd/etc/fluent.conf;
+            # cp /fluentd/etc2/kubernetes.conf /fluentd/etc/kubernetes.conf;
           volumeMounts:
-            - name: fluentconfig
-              mountPath: /tempconf
-            - name: pre-install
-              mountPath: /fluentd/etc/
+          - name: config-path
+            mountPath: /fluentd/etc
+          - name: config-source
+            mountPath: /fluentd/etc2
       volumes:
-      - name: pre-install
-        emptyDir: {}
-      - name: fluentconfig
-        configMap:
-          name: fluentdconf
       - name: varlog
         hostPath:
           path: /var/log
       - name: varlibdockercontainers
         hostPath:
           path: /var/lib/docker/containers
+      - name: config-source
+        configMap:
+          name: fluentd-config
+      - name: config-path
+        emptyDir: {}
