@@ -17,7 +17,7 @@ data:
       time_format %Y-%m-%dT%H:%M:%S.%NZ
       tag kubernetes.*
       format json
-      read_from_head true
+      read_from_head false
     </source>
 
     <filter kubernetes.**>
@@ -32,7 +32,7 @@ data:
       @type null
     </match>
 
-    <match kubernetes.**>
+    <match kubernetes.var.log.containers.app**.log>
       @type copy
       <store>
         @type stdout
