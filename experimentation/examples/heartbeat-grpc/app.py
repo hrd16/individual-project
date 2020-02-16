@@ -36,19 +36,20 @@ def serve():
 
 def heartbeat(exit_flag, nodes):
     interval = 1.0
-    timeout = 5.0
+    timeout = 3.0
     last_seen = {node: time.time() for node in nodes}
     channels = {node: grpc.insecure_channel(node) for node in nodes}
 
     def update_heartbeat(node):
-        t = time.time()
-        if t - last_seen[node] > timeout:
-            logger.error(f'Node {node} failed heartbeat')
+        last_seen[node] = time.time()
 
-        last_seen[node] = t
+    def check_heartbeat(node):
+        if time.time() - last_seen[node] > timeout:
+            logger.error(f'Node {node} failed heartbeat')
 
     while not exit_flag.is_set():
         for node in nodes:
+            check_heartbeat(node)
             stub = erb_pb2_grpc.HeartbeatStub(channels[node])
             call_future = stub.SendHearbeat.future(erb_pb2.Hearbeat())
             call_future.add_done_callback(lambda r: update_heartbeat(node))
@@ -59,10 +60,13 @@ if __name__ == '__main__':
     sim = len(sys.argv) >= 3
     num_replicas = int(sys.argv[1]) if sim else 1
     hostname = sys.argv[2] if sim else '127.0.0.1'
-    nodes = [f'{hostname}:{PORT}']
+
+    logger.info(f'Replicas: {num_replicas}')
+    logger.info(f'Hostname: {hostname}')
+
+    nodes = []
     if sim:
         nodes = [f'app-{i}.app-service.default.svc.cluster.local:{PORT}' for i in range(num_replicas)]
-        nodes = nodes.remove(hostname)
 
     logger.info(nodes)
 
