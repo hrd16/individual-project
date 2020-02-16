@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+service Heartbeat {
+    rpc SendHearbeat (Hearbeat) returns (HearbeatReply);
+}
+  
+message Hearbeat {
+}
+
+message HearbeatReply {
+}
