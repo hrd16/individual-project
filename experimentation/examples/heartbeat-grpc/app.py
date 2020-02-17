@@ -53,7 +53,7 @@ def heartbeat(exit_flag, nodes):
             check_heartbeat(node)
             stub = erb_pb2_grpc.HeartbeatStub(channels[node])
             call_future = stub.SendHearbeat.future(erb_pb2.Hearbeat(), timeout=timeout)
-            call_future.add_done_callback(lambda r: update_heartbeat(node))
+            call_future.add_done_callback(lambda r, node=node: update_heartbeat(node))
             
         time.sleep(interval)
 
