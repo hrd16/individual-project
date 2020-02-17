@@ -13,7 +13,7 @@ PORT = 4400
 
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('[%(name)9s] - %(message)s')
+formatter = logging.Formatter('[%(asctime)s] [%(name)9s] - %(message)s')
 ch.setFormatter(formatter)
 
 logger = logging.getLogger('test-server')
@@ -44,16 +44,18 @@ def heartbeat(exit_flag, nodes):
         last_seen[node] = time.time()
 
     def check_heartbeat(node):
-        if time.time() - last_seen[node] > timeout:
-            logger.error(f'Node {node} failed heartbeat')
+        diff = time.time() - last_seen[node]
+        if diff > timeout:
+            logger.error(f'Node {node} failed heartbeat {diff}')
 
     while not exit_flag.is_set():
         for node in nodes:
             check_heartbeat(node)
             stub = erb_pb2_grpc.HeartbeatStub(channels[node])
-            call_future = stub.SendHearbeat.future(erb_pb2.Hearbeat())
+            call_future = stub.SendHearbeat.future(erb_pb2.Hearbeat(), timeout=timeout)
             call_future.add_done_callback(lambda r: update_heartbeat(node))
-            time.sleep(interval)
+            
+        time.sleep(interval)
 
 
 if __name__ == '__main__':
@@ -64,7 +66,7 @@ if __name__ == '__main__':
     logger.info(f'Replicas: {num_replicas}')
     logger.info(f'Hostname: {hostname}')
 
-    nodes = []
+    nodes = [f'{hostname}:{PORT}']
     if sim:
         nodes = [f'app-{i}.app-service.default.svc.cluster.local:{PORT}' for i in range(num_replicas)]
 
