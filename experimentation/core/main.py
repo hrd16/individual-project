@@ -8,7 +8,6 @@ import yaml
 from os import path
 import uuid
 from pprint import pprint
-import yaml
 
 def pre_process(src_dir, out_dir):
     copy_tree(src_dir, out_dir)
@@ -31,8 +30,28 @@ def create_namespace(api_client, namespace):
     body = client.V1Namespace(metadata=metadata)
     api_client.create_namespace(body=body)
 
+def create_log_server(core_v1, apps_v1, namespace):
+    with open(path.join(path.dirname(__file__), "kubernetes", "log-server-service.yaml")) as f:
+        service_yaml = yaml.safe_load(f)
+
+    with open(path.join(path.dirname(__file__), "kubernetes", "log-server-deployment.yaml")) as f:
+        deployment_yaml = yaml.safe_load(f)
+
+    core_v1.create_namespaced_service(body=service_yaml, namespace=namespace)
+    apps_v1.create_namespaced_deployment(body=deployment_yaml, namespace=namespace)
+
+def create_fluentd(core_v1, apps_v1, namespace):
+    with open(path.join(path.dirname(__file__), "kubernetes", "fluentd-config.yaml")) as f:
+        config_yaml = yaml.safe_load(f)
+
+    with open(path.join(path.dirname(__file__), "kubernetes", "fluentd-daemonset.yaml")) as f:
+        daemonset_yaml = yaml.safe_load(f)
+
+    core_v1.create_namespaced_config_map(body=config_yaml, namespace=namespace)
+    apps_v1.create_namespaced_daemon_set(body=daemonset_yaml, namespace=namespace)
+
 def create_service(api_client, namespace):
-    with open(path.join(path.dirname(__file__), "service.yaml")) as f:
+    with open(path.join(path.dirname(__file__), "kubernetes", "app-service.yaml")) as f:
         service_yaml = yaml.safe_load(f)
 
     api_client.create_namespaced_service(body=service_yaml, namespace=namespace)
@@ -72,10 +91,21 @@ if __name__ == "__main__":
     config.load_kube_config()
     core_v1 = client.CoreV1Api()
     apps_v1 = client.AppsV1Api()
+    apps_v1_ext = client.ExtensionsV1beta1Api()
 
     namespace = uuid.uuid4().hex
-    print('Namespace', namespace)
 
+    print('Create namespace', namespace)
     create_namespace(core_v1, namespace)
+
+    print('Create log server')
+    create_log_server(core_v1, apps_v1, namespace)
+
+    print('Create fluentd')
+    create_fluentd(core_v1, apps_v1_ext, namespace)
+
+    print('Create app service')
     create_service(core_v1, namespace)
+
+    print('Create app deployment')
     create_deployment(apps_v1, namespace, sim_config['replicas'])

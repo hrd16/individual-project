@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      deploy: log-service
+  template:
+    metadata:
+      labels:
+        deploy: log-service
+        run: log-service
+    spec:
+      containers:
+        - name: log-server
+          image: log-server:1.0
+          ports:
+          - containerPort: 3000
