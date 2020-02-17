@@ -58,11 +58,16 @@ def create_service(api_client, namespace):
 
 def create_deployment(api_client, namespace, replicas):
     # Continer
-    field_selector = client.V1ObjectFieldSelector(field_path="status.podIP")
-    env_src = client.V1EnvVarSource(field_ref=field_selector)
-    container_env = client.V1EnvVar(name="POD_IP", value_from=env_src)
+    pod_ip_fs = client.V1ObjectFieldSelector(field_path="status.podIP")
+    pod_ip_src = client.V1EnvVarSource(field_ref=pod_ip_fs)
+    pod_ip_env = client.V1EnvVar(name="POD_IP", value_from=pod_ip_src)
+
+    pod_ns_fs = client.V1ObjectFieldSelector(field_path="metadata.namespace")
+    pod_ns_src = client.V1EnvVarSource(field_ref=pod_ns_fs)
+    pod_ns_env = client.V1EnvVar(name="POD_NAMESPACE", value_from=pod_ns_src)
+
     container_spec = client.V1Container(name="app", image="app:1.0", command=["python3"], 
-        args=["app.py", "3", "$(POD_IP)"], env=[container_env])
+        args=["app.py", str(replicas), "$(POD_IP)", "$(POD_NAMESPACE)"], env=[pod_ip_env, pod_ns_env])
 
     # Pod
     pod_spec = client.V1PodSpec(termination_grace_period_seconds=10, containers=[container_spec])
