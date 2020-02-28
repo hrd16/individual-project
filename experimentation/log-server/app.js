@@ -9,9 +9,7 @@ const port = 3000;
 
 app.use(bodyParser.text( { type: 'application/x-ndjson', limit: '50mb' } ));
 
-app.get('/', (req, res) => res.send('Hello World!'));
-
-app.post('/', function (req, res) {
+app.post('/app', function (req, res) {
     let data = req.body;
 
     Readable.from([data]).pipe(ndjson.parse())
@@ -22,6 +20,19 @@ app.post('/', function (req, res) {
         });
     
     res.sendStatus(200);
+});
+
+app.post('/proxy', function (req, res) {
+   let data = req.body;
+
+   Readable.from([data]).pipe(ndjson.parse())
+       .on('data', function(msg) {
+           let pod_name = msg.kubernetes !== undefined ? msg.kubernetes.pod_name : 'undefined';
+           let log = msg.log || 'undefined';
+           console.log(pod_name, log);
+       });
+   
+   res.sendStatus(200);
 });
 
 app.listen(port, () => console.log(`Log server listening on port ${port}!`));

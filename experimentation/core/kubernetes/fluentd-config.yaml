@@ -30,7 +30,7 @@ data:
       @type null
     </match>
 
-    <match kubernetes.var.log.containers.app**.log>
+    <match kubernetes.var.log.containers.app**_app**.log>
       @type copy
       <store>
         @type stdout
@@ -39,7 +39,29 @@ data:
       <store>
         @type http
 
-        endpoint http://log-service:3000/
+        endpoint http://log-service:3000/app
+        open_timeout 2
+
+        <format>
+          @type json
+        </format>
+        
+        <buffer>
+          flush_interval 10s
+        </buffer>
+      </store>
+    </match>
+
+    <match kubernetes.var.log.containers.app**_goproxy**.log>
+      @type copy
+      <store>
+        @type stdout
+      </store>
+
+      <store>
+        @type http
+
+        endpoint http://log-service:3000/proxy
         open_timeout 2
 
         <format>

@@ -73,7 +73,7 @@ def create_deployment(api_client, namespace, replicas):
     haproxy_container_spec = client.V1Container(name="haproxy", image="app-haproxy:1.0")
 
     # App Proxy Container
-    app_proxy_container_spec = client.V1Container(name="app-proxy", image="app-proxy:1.0", 
+    app_proxy_container_spec = client.V1Container(name="goproxy", image="app-proxy:1.0", 
         args=[str(replicas), "$(POD_NAMESPACE)"], env=[pod_ns_env])
 
     # Pod

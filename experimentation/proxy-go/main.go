@@ -23,7 +23,7 @@ func main() {
 
 	lookup := make(map[string]string)
 
-	for i := 0; i < replicas; i++ {
+	for i := 0; i < replicas; {
 		addr := fmt.Sprintf("app-%d.app-service.%s.svc.cluster.local", i, namespace)
 		ips, err := net.LookupIP(addr)
 		if err != nil {
@@ -32,6 +32,7 @@ func main() {
 			time.Sleep(time.Millisecond * 100)
 		} else {
 			lookup[ips[0].String()] = addr
+			i++
 		}
 	}
 
