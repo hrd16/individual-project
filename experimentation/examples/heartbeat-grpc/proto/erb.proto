@@ -5,7 +5,11 @@ service Heartbeat {
 }
   
 message Hearbeat {
+    uint32 id = 1;
+    string name = 2;
+    bytes bytes = 3;
 }
 
 message HearbeatReply {
+    uint32 id = 1;
 }

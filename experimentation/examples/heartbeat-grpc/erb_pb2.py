@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\terb.proto\"\n\n\x08Hearbeat\"\x0f\n\rHearbeatReply26\n\tHeartbeat\x12)\n\x0cSendHearbeat\x12\t.Hearbeat\x1a\x0e.HearbeatReplyb\x06proto3'
+  serialized_pb=b'\n\terb.proto\"3\n\x08Hearbeat\x12\n\n\x02id\x18\x01 \x01(\r\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\r\n\x05\x62ytes\x18\x03 \x01(\x0c\"\x1b\n\rHearbeatReply\x12\n\n\x02id\x18\x01 \x01(\r26\n\tHeartbeat\x12)\n\x0cSendHearbeat\x12\t.Hearbeat\x1a\x0e.HearbeatReplyb\x06proto3'
 )
 
 
@@ -31,6 +31,27 @@ _HEARBEAT = _descriptor.Descriptor(
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='Hearbeat.id', index=0,
+      number=1, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='name', full_name='Hearbeat.name', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='bytes', full_name='Hearbeat.bytes', index=2,
+      number=3, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -44,7 +65,7 @@ _HEARBEAT = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=13,
-  serialized_end=23,
+  serialized_end=64,
 )
 
 
@@ -55,6 +76,13 @@ _HEARBEATREPLY = _descriptor.Descriptor(
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='HearbeatReply.id', index=0,
+      number=1, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -67,8 +95,8 @@ _HEARBEATREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=25,
-  serialized_end=40,
+  serialized_start=66,
+  serialized_end=93,
 )
 
 DESCRIPTOR.message_types_by_name['Hearbeat'] = _HEARBEAT
@@ -97,8 +125,8 @@ _HEARTBEAT = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=42,
-  serialized_end=96,
+  serialized_start=95,
+  serialized_end=149,
   methods=[
   _descriptor.MethodDescriptor(
     name='SendHearbeat',
