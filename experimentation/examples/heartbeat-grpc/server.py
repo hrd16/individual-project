@@ -9,7 +9,8 @@ import grpc
 import erb_pb2
 import erb_pb2_grpc
 
-PORT = 4400
+PROXY_PORT = 4500
+BIND_PORT = 4400
 
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
@@ -30,7 +31,7 @@ class TestServer(erb_pb2_grpc.HeartbeatServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     erb_pb2_grpc.add_HeartbeatServicer_to_server(TestServer(), server)
-    server.add_insecure_port(f'[::]:{PORT}')
+    server.add_insecure_port(f'[::]:{BIND_PORT}')
     server.start()
     server.wait_for_termination()
 
@@ -69,9 +70,9 @@ if __name__ == '__main__':
     logger.info(f'Hostname: {hostname}')
     logger.info(f'Namespace: {namespace}')
 
-    nodes = [f'{hostname}:{PORT}']
+    nodes = [f'{hostname}:{PROXY_PORT}']
     if sim:
-        nodes = [f'app-{i}.app-service.{namespace}.svc.cluster.local:{PORT}' for i in range(num_replicas)]
+        nodes = [f'app-{i}.app-service.{namespace}.svc.cluster.local:{PROXY_PORT}' for i in range(num_replicas)]
 
     logger.info(nodes)
 

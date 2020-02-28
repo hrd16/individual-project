@@ -9,7 +9,8 @@ import grpc
 import erb_pb2
 import erb_pb2_grpc
 
-PORT = 4400
+PROXY_PORT = 4500
+BIND_PORT = 4400
 
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
@@ -29,7 +30,7 @@ class TestServer(erb_pb2_grpc.HeartbeatServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     erb_pb2_grpc.add_HeartbeatServicer_to_server(TestServer(), server)
-    server.add_insecure_port(f'[::]:{PORT}')
+    server.add_insecure_port(f'[::]:{BIND_PORT}')
     server.start()
     server.wait_for_termination()
 
@@ -40,8 +41,12 @@ def heartbeat(exit_flag, nodes):
     last_seen = {node: time.time() for node in nodes}
     channels = {node: grpc.insecure_channel(node) for node in nodes}
 
-    def update_heartbeat(node):
-        last_seen[node] = time.time()
+    def update_heartbeat(node, call_future):
+        try:
+            logger.info(f'Response {node} - {call_future.result()}')
+            last_seen[node] = time.time()
+        except Exception as e:
+            logger.error(f'Exception {node} {e}')
 
     def check_heartbeat(node):
         diff = time.time() - last_seen[node]
@@ -53,8 +58,8 @@ def heartbeat(exit_flag, nodes):
             check_heartbeat(node)
             stub = erb_pb2_grpc.HeartbeatStub(channels[node])
             call_future = stub.SendHearbeat.future(erb_pb2.Hearbeat(), timeout=timeout)
-            call_future.add_done_callback(lambda r, node=node: update_heartbeat(node))
-            
+            call_future.add_done_callback(lambda r, node=node, future=call_future: update_heartbeat(node, future))
+
         time.sleep(interval)
 
 
@@ -68,9 +73,9 @@ if __name__ == '__main__':
     logger.info(f'Hostname: {hostname}')
     logger.info(f'Namespace: {namespace}')
 
-    nodes = [f'{hostname}:{PORT}']
+    nodes = [f'{hostname}:{PROXY_PORT}']
     if sim:
-        nodes = [f'app-{i}.app-service.{namespace}.svc.cluster.local:{PORT}' for i in range(num_replicas)]
+        nodes = [f'app-{i}.app-service.{namespace}.svc.cluster.local:{PROXY_PORT}' for i in range(num_replicas)]
 
     logger.info(nodes)
 

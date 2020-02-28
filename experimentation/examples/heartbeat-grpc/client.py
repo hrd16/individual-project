@@ -23,5 +23,5 @@ logger.addHandler(ch)
 if __name__ == '__main__':
     channel = grpc.insecure_channel(f'127.0.0.1:{PORT}')
     stub = erb_pb2_grpc.HeartbeatStub(channel)
-    call_future = stub.SendHearbeat.future(erb_pb2.Hearbeat(id=7, name="qwertyyuiop", bytes=os.urandom(4096)))
+    call_future = stub.SendHearbeat.future(erb_pb2.Hearbeat())
     logger.info(call_future.result())

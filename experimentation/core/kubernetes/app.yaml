@@ -35,4 +35,9 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
           command: ["python3"]
-          args: ["app.py", "3", "$(POD_IP)"]
+          args: ["app.py", "3", "$(POD_IP)", "default"]
+        - name: haproxy
+          image: app-haproxy:1.0
+        - name: app-proxy
+          image: app-proxy:1.0
+          args: ["3", "default"]
