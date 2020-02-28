@@ -57,7 +57,7 @@ def create_service(api_client, namespace):
     api_client.create_namespaced_service(body=service_yaml, namespace=namespace)
 
 def create_deployment(api_client, namespace, replicas):
-    # Continer
+    # Container
     pod_ip_fs = client.V1ObjectFieldSelector(field_path="status.podIP")
     pod_ip_src = client.V1EnvVarSource(field_ref=pod_ip_fs)
     pod_ip_env = client.V1EnvVar(name="POD_IP", value_from=pod_ip_src)
@@ -66,11 +66,19 @@ def create_deployment(api_client, namespace, replicas):
     pod_ns_src = client.V1EnvVarSource(field_ref=pod_ns_fs)
     pod_ns_env = client.V1EnvVar(name="POD_NAMESPACE", value_from=pod_ns_src)
 
-    container_spec = client.V1Container(name="app", image="app:1.0", command=["python3"], 
+    app_container_spec = client.V1Container(name="app", image="app:1.0", command=["python3"], 
         args=["app.py", str(replicas), "$(POD_IP)", "$(POD_NAMESPACE)"], env=[pod_ip_env, pod_ns_env])
 
+    # HAProxy Container
+    haproxy_container_spec = client.V1Container(name="haproxy", image="app-haproxy:1.0")
+
+    # App Proxy Container
+    app_proxy_container_spec = client.V1Container(name="app-proxy", image="app-proxy:1.0", 
+        args=[str(replicas), "$(POD_NAMESPACE)"], env=[pod_ns_env])
+
     # Pod
-    pod_spec = client.V1PodSpec(termination_grace_period_seconds=10, containers=[container_spec])
+    pod_spec = client.V1PodSpec(termination_grace_period_seconds=10, 
+        containers=[app_container_spec, haproxy_container_spec, app_proxy_container_spec])
     pod_metadata = client.V1ObjectMeta(labels={"app": "app-service"})
     pod_template_spec = client.V1PodTemplateSpec(metadata=pod_metadata, spec=pod_spec)
 

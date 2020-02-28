@@ -59,7 +59,7 @@ func main() {
 		r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 
 		xfwd := r.Header.Get("X-Forwarded-For")
-		log.Printf("%s - %s - %s\n", r.URL.Path, xfwd, lookup[xfwd])
+		log.Printf("%s - %s\n", r.URL.Path, lookup[xfwd])
 
 		time.Sleep(500 * time.Millisecond)
 
