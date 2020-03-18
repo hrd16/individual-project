@@ -8,6 +8,7 @@ import yaml
 from os import path
 import uuid
 from pprint import pprint
+import argparse
 
 def pre_process(src_dir, out_dir):
     copy_tree(src_dir, out_dir)
@@ -56,7 +57,7 @@ def create_service(api_client, namespace):
 
     api_client.create_namespaced_service(body=service_yaml, namespace=namespace)
 
-def create_deployment(api_client, namespace, replicas):
+def create_deployment(api_client, namespace, replicas, latency, dropRate):
     # Container
     pod_ip_fs = client.V1ObjectFieldSelector(field_path="status.podIP")
     pod_ip_src = client.V1EnvVarSource(field_ref=pod_ip_fs)
@@ -74,7 +75,7 @@ def create_deployment(api_client, namespace, replicas):
 
     # App Proxy Container
     app_proxy_container_spec = client.V1Container(name="goproxy", image="app-proxy:1.0", 
-        args=[str(replicas), "$(POD_NAMESPACE)"], env=[pod_ns_env])
+        args=[str(replicas), "$(POD_NAMESPACE)", str(latency), str(dropRate)], env=[pod_ns_env])
 
     # Pod
     pod_spec = client.V1PodSpec(termination_grace_period_seconds=10, 
@@ -93,10 +94,14 @@ def create_deployment(api_client, namespace, replicas):
     api_client.create_namespaced_stateful_set(body=deployment, namespace=namespace)
 
 if __name__ == "__main__":
-    dir_path = sys.argv[1]
+    parser = argparse.ArgumentParser()
+    parser.add_argument('directory', type=str)
+    #parser.add_argument('--latency', type=int, default=0)
+    #parser.add_argument('--drop_rate', type=float, default=0)
+    args = parser.parse_args()
 
     with tempfile.TemporaryDirectory() as tmp_dir:
-        pre_process(dir_path, tmp_dir)
+        pre_process(args.directory, tmp_dir)
         build_image(tmp_dir)
         sim_config = read_config(tmp_dir)
         print('Config', sim_config)
@@ -121,4 +126,6 @@ if __name__ == "__main__":
     create_service(core_v1, namespace)
 
     print('Create app deployment')
-    create_deployment(apps_v1, namespace, sim_config['replicas'])
+    latency = sim_config.get('latency', 0)
+    dropRate = sim_config.get('dropRate', 0)
+    create_deployment(apps_v1, namespace, sim_config['replicas'], latency, dropRate)

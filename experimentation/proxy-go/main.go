@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -17,9 +18,13 @@ import (
 func main() {
 	replicas, _ := strconv.Atoi(os.Args[1])
 	namespace := os.Args[2]
+	latency, _ := strconv.Atoi(os.Args[3])
+	dropRate, _ := strconv.ParseFloat(os.Args[4], 64)
 
 	fmt.Printf("Replicas: %d\n", replicas)
 	fmt.Printf("Namespace: %s\n", namespace)
+	fmt.Printf("Latency: %d\n", latency)
+	fmt.Printf("Drop rate: %f\n", dropRate)
 
 	lookup := make(map[string]string)
 
@@ -62,7 +67,11 @@ func main() {
 		xfwd := r.Header.Get("X-Forwarded-For")
 		log.Printf("%s - %s\n", r.URL.Path, lookup[xfwd])
 
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(time.Duration(latency) * time.Millisecond)
+
+		if rand.Float64() < dropRate {
+			return
+		}
 
 		proxy.ServeHTTP(w, r)
 	})
