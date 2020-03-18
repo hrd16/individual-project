@@ -2,10 +2,13 @@ const express = require('express');
 const bodyParser = require('body-parser');
 var ndjson = require('ndjson')
 const { Readable } = require('stream')
+const WebSocket = require('ws');
 require('console-stamp')(console, '[HH:MM:ss.l]');
 
 const app = express();
 const port = 3000;
+
+const wss = new WebSocket.Server({ port: 3001 });
 
 app.use(bodyParser.text( { type: 'application/x-ndjson', limit: '50mb' } ));
 
@@ -16,21 +19,36 @@ app.post('/app', function (req, res) {
         .on('data', function(msg) {
             let pod_name = msg.kubernetes !== undefined ? msg.kubernetes.pod_name : 'undefined';
             let log = msg.log || 'undefined';
-            console.log(pod_name, log);
+            //console.log(pod_name, log);
         });
     
     res.sendStatus(200);
 });
 
+proxy_logs = []
+
+wss.on('connection', function connection(ws) {
+    ws.send(proxy_logs)
+});
+
+app.get('/helloworld', function(req, res) {
+    res.send(`${proxy_logs.length}`);
+});
+
 app.post('/proxy', function (req, res) {
    let data = req.body;
 
-   Readable.from([data]).pipe(ndjson.parse())
-       .on('data', function(msg) {
-           let pod_name = msg.kubernetes !== undefined ? msg.kubernetes.pod_name : 'undefined';
-           let log = msg.log || 'undefined';
-           console.log(pod_name, log);
-       });
+    Readable.from([data]).pipe(ndjson.parse())
+        .on('data', function(msg) {
+            let pod_name = msg.kubernetes !== undefined ? msg.kubernetes.pod_name : 'undefined';
+            let log = msg.log || 'undefined';
+            logMsg = pod_name + log
+            console.log(logMsg);
+            proxy_logs.push(logMsg)
+            wss.clients.forEach(function each(client) {
+                client.send(logMsg);
+            });
+        });
    
    res.sendStatus(200);
 });

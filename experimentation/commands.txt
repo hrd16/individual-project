@@ -1,1 +1,5 @@
 nghttpx -b'127.0.0.1,4400;;proto=h2;no-tls' -f'127.0.0.1,4500;;no-tls' --accesslog-file=log.txt --log-level=INFO
+
+kubectl expose deployment log-server --type="NodePort" --name=test-service -n 9bc6bdfaf0e64c85a21c10bb4ae23da0 --port 3000
+
+kubectl describe service test-service -n 9bc6bdfaf0e64c85a21c10bb4ae23da0
