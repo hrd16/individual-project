@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 
-const URL = 'ws://localhost:30312'
+const URL = 'ws://localhost:32338'
 
 const Container = styled.div`
 
@@ -26,15 +26,15 @@ class Log extends Component {
     componentDidMount() {
         this.ws.onopen = () => {
             console.log('connected')
-          }
+        }
       
-          this.ws.onmessage = evt => {
+        this.ws.onmessage = evt => {
             const msgs = JSON.parse(evt.data)
             console.log(msgs)
             msgs.forEach(msg => {
                 this.addMessage(msg)
             })
-          }
+        }
       
           this.ws.onclose = () => {
             console.log('disconnected')
