@@ -25,7 +25,7 @@ app.post('/app', function (req, res) {
     res.sendStatus(200);
 });
 
-proxy_logs = []
+var proxy_logs = []
 
 wss.on('connection', function connection(ws) {
     ws.send(JSON.stringify(proxy_logs))
@@ -36,20 +36,23 @@ app.get('/helloworld', function(req, res) {
 });
 
 app.post('/proxy', function (req, res) {
-   let data = req.body;
+    let data = req.body;
 
-    let newMsgs = []
+    let newMsgs = [];
 
     Readable.from([data]).pipe(ndjson.parse())
-        .on('data', function(msg) {
+        .on('data', function(msg, newMsgs) {
             let pod_name = msg.kubernetes !== undefined ? msg.kubernetes.pod_name : 'undefined';
             let log = msg.log || 'undefined';
-            logMsg = {pod: pod_name, msg: log}
+            let logMsg = {pod: pod_name, msg: log}
             console.log(logMsg);
-            newMsgs.push(logMsg);
+            newMsgs.push(logMsg)
+            console.log(newMsgs.length)
         });
 
-    proxy_logs.concat(newMsgs);
+    console.log(newMsgs.length);
+    proxy_logs = proxy_logs.concat(newMsgs);
+    console.log(proxy_logs.length);
 
     wss.clients.forEach(function each(client) {
         client.send(JSON.stringify(newMsgs));

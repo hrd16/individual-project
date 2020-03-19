@@ -1,0 +1,1 @@
+docker build -t frontend-server:1.0 .

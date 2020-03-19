@@ -41,6 +41,16 @@ def create_log_server(core_v1, apps_v1, namespace):
     core_v1.create_namespaced_service(body=service_yaml, namespace=namespace)
     apps_v1.create_namespaced_deployment(body=deployment_yaml, namespace=namespace)
 
+def create_frontend_server(core_v1, apps_v1, namespace):
+    with open(path.join(path.dirname(__file__), "kubernetes", "frontend-service.yaml")) as f:
+        service_yaml = yaml.safe_load(f)
+
+    with open(path.join(path.dirname(__file__), "kubernetes", "frontend-deployment.yaml")) as f:
+        deployment_yaml = yaml.safe_load(f)
+
+    core_v1.create_namespaced_service(body=service_yaml, namespace=namespace)
+    apps_v1.create_namespaced_deployment(body=deployment_yaml, namespace=namespace)
+
 def create_fluentd(core_v1, apps_v1, namespace):
     with open(path.join(path.dirname(__file__), "kubernetes", "fluentd-config.yaml")) as f:
         config_yaml = yaml.safe_load(f)
@@ -96,8 +106,6 @@ def create_deployment(api_client, namespace, replicas, latency, dropRate):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('directory', type=str)
-    #parser.add_argument('--latency', type=int, default=0)
-    #parser.add_argument('--drop_rate', type=float, default=0)
     args = parser.parse_args()
 
     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -121,6 +129,9 @@ if __name__ == "__main__":
 
     print('Create fluentd')
     create_fluentd(core_v1, apps_v1_ext, namespace)
+
+    print('Create frontend server')
+    create_frontend_server(core_v1, apps_v1, namespace)
 
     print('Create app service')
     create_service(core_v1, namespace)

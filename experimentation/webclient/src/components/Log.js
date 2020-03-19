@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 
-const URL = 'ws://localhost:3001'
+const URL = 'ws://localhost:30312'
 
 const Container = styled.div`
 
