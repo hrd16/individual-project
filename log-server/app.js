@@ -12,7 +12,12 @@ const wss = new WebSocket.Server({ port: 3001 });
 
 app.use(bodyParser.text( { type: 'application/x-ndjson', limit: '50mb' } ));
 
-app.post('/app', function (req, res) {
+const apiRouter = express.Router();
+app.use('/api', apiRouter);
+
+app.use(express.static('client/build'));
+
+apiRouter.post('/app', function (req, res) {
     let data = req.body;
 
     Readable.from([data]).pipe(ndjson.parse())
@@ -31,11 +36,11 @@ wss.on('connection', function connection(ws) {
     ws.send(JSON.stringify(proxy_logs))
 });
 
-app.get('/helloworld', function(req, res) {
+apiRouter.get('/helloworld', function(req, res) {
     res.send(`${proxy_logs.length}`);
 });
 
-app.post('/proxy', function (req, res) {
+apiRouter.post('/proxy', function (req, res) {
     let data = req.body;
 
     let newMsgs = [];
