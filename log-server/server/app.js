@@ -4,40 +4,55 @@ var ndjson = require('ndjson')
 const { Readable } = require('stream')
 const WebSocket = require('ws');
 require('console-stamp')(console, '[HH:MM:ss.l]');
+let server = require('http').createServer();
 
 const app = express();
 const port = 3000;
 
-const wss = new WebSocket.Server({ port: 3001 });
+const wss = new WebSocket.Server({ server: server, path: '/api/ws' });
+server.on('request', app);
 
 app.use(bodyParser.text( { type: 'application/x-ndjson', limit: '50mb' } ));
 
 const apiRouter = express.Router();
 app.use('/api', apiRouter);
 
-app.use(express.static('client/build'));
+app.use(express.static('../client/build'));
+
+var app_logs = [];
 
 apiRouter.post('/app', function (req, res) {
     let data = req.body;
+
+    let newMsgs = [];
 
     Readable.from([data]).pipe(ndjson.parse())
         .on('data', function(msg) {
             let pod_name = msg.kubernetes !== undefined ? msg.kubernetes.pod_name : 'undefined';
             let log = msg.log || 'undefined';
-            //console.log(pod_name, log);
+            let logMsg = {pod: pod_name, msg: log};
+            console.log(logMsg);
+            newMsgs.push(logMsg);
+        })
+        .on('end', function() {
+            app_logs = app_logs.concat(newMsgs);
+
+            wss.clients.forEach(function each(client) {
+                client.send(JSON.stringify(newMsgs));
+            });
         });
     
     res.sendStatus(200);
 });
 
-var proxy_logs = []
+var proxy_logs = [];
 
 wss.on('connection', function connection(ws) {
-    ws.send(JSON.stringify(proxy_logs))
+    ws.send(JSON.stringify(app_logs))
 });
 
 apiRouter.get('/helloworld', function(req, res) {
-    res.send(`${proxy_logs.length}`);
+    res.send(`${app_logs.length}`);
 });
 
 apiRouter.post('/proxy', function (req, res) {
@@ -64,7 +79,7 @@ apiRouter.post('/proxy', function (req, res) {
    res.sendStatus(200);
 });
 
-app.listen(port, () => console.log(`Log server listening on port ${port}!`));
+server.listen(port, () => console.log(`Log server listening on port ${port}!`));
 
 /*
 Sample fluentd json

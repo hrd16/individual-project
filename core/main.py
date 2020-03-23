@@ -35,20 +35,15 @@ def create_log_server(core_v1, apps_v1, namespace):
     with open(path.join(path.dirname(__file__), "kubernetes", "log-server-service.yaml")) as f:
         service_yaml = yaml.safe_load(f)
 
+    with open(path.join(path.dirname(__file__), "kubernetes", "log-server-frontend-service.yaml")) as f:
+        frontend_service_yaml = yaml.safe_load(f)
+
     with open(path.join(path.dirname(__file__), "kubernetes", "log-server-deployment.yaml")) as f:
         deployment_yaml = yaml.safe_load(f)
 
     core_v1.create_namespaced_service(body=service_yaml, namespace=namespace)
-    apps_v1.create_namespaced_deployment(body=deployment_yaml, namespace=namespace)
-
-def create_frontend_server(core_v1, apps_v1, namespace):
-    with open(path.join(path.dirname(__file__), "kubernetes", "frontend-service.yaml")) as f:
-        service_yaml = yaml.safe_load(f)
-
-    with open(path.join(path.dirname(__file__), "kubernetes", "frontend-deployment.yaml")) as f:
-        deployment_yaml = yaml.safe_load(f)
-
-    core_v1.create_namespaced_service(body=service_yaml, namespace=namespace)
+    res = core_v1.create_namespaced_service(body=frontend_service_yaml, namespace=namespace)
+    pprint(res)
     apps_v1.create_namespaced_deployment(body=deployment_yaml, namespace=namespace)
 
 def create_fluentd(core_v1, apps_v1, namespace):
@@ -129,9 +124,6 @@ if __name__ == "__main__":
 
     print('Create fluentd')
     create_fluentd(core_v1, apps_v1_ext, namespace)
-
-    print('Create frontend server')
-    create_frontend_server(core_v1, apps_v1, namespace)
 
     print('Create app service')
     create_service(core_v1, namespace)

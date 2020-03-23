@@ -39,7 +39,7 @@ data:
       <store>
         @type http
 
-        endpoint http://log-service:3000/app
+        endpoint http://log-service:3000/api/app
         open_timeout 2
 
         <format>
@@ -61,7 +61,7 @@ data:
       <store>
         @type http
 
-        endpoint http://log-service:3000/proxy
+        endpoint http://log-service:3000/api/proxy
         open_timeout 2
 
         <format>

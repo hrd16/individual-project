@@ -1,17 +1,8 @@
-import React, { Component } from 'react'
-import styled from 'styled-components'
+import React, { Component } from 'react';
 import { Table } from 'antd';
 var dateFormat = require('dateformat');
 
-const URL = 'ws://localhost:32338'
-
-const Container = styled.div`
-
-`;
-
-const Message = styled.p`
-    margin: 0
-`;
+const URL = 'ws://localhost:3000/api/ws';
 
 class Log extends Component {
 
@@ -57,7 +48,6 @@ class Log extends Component {
       
           this.ws.onclose = () => {
             console.log('disconnected');
-            // reconnect on connection loss
             this.setState({
               ws: new WebSocket(URL),
             });
@@ -110,12 +100,9 @@ class Log extends Component {
         ];
 
         return (
-            <Container>
-                {/* {this.state.messages.map((message, index) =>
-                    <Message key={index}>{JSON.stringify(message)}</Message>
-                )} */}
+            <div>
                 <Table dataSource={this.state.messages} columns={columns} pagination={{ pageSize: 50 }} />
-            </Container>
+            </div>
         )
     }
 
