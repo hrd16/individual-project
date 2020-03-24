@@ -79,7 +79,9 @@ apiRouter.post('/proxy', function (req, res) {
    res.sendStatus(200);
 });
 
-server.listen(port, () => console.log(`Log server listening on port ${port}!`));
+//server.listen(port, () => console.log(`Log server listening on port ${port}!`));
+
+module.exports = server
 
 /*
 Sample fluentd json
