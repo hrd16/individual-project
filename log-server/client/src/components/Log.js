@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import { Table } from 'antd';
 var dateFormat = require('dateformat');
 
-const URL = 'ws://localhost:3000/api/ws';
+const URL = 'ws://localhost:31234/api/ws';
 
 class Log extends Component {
 
     state = {
-        messages: this.testData()
+        messages: [] //this.testData()
     }
 
     ws = new WebSocket(URL);

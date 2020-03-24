@@ -42,8 +42,7 @@ def create_log_server(core_v1, apps_v1, namespace):
         deployment_yaml = yaml.safe_load(f)
 
     core_v1.create_namespaced_service(body=service_yaml, namespace=namespace)
-    res = core_v1.create_namespaced_service(body=frontend_service_yaml, namespace=namespace)
-    pprint(res)
+    core_v1.create_namespaced_service(body=frontend_service_yaml, namespace=namespace)
     apps_v1.create_namespaced_deployment(body=deployment_yaml, namespace=namespace)
 
 def create_fluentd(core_v1, apps_v1, namespace):

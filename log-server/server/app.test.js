@@ -49,5 +49,6 @@ const test_json = JSON.stringify(
          },
          "master_url":"https://10.96.0.1:443/api",
          "namespace_id":"180672a1-063d-11ea-ad93-025000000001"
-      }
+      },
+      "timestamp":"2020-03-24 12:45:09 +0000"
    });

@@ -30,8 +30,17 @@ data:
       @type null
     </match>
 
+    <filter kubernetes.var.log.containers.app**.log>
+      @type record_transformer
+      enable_ruby true
+      <record>
+        timestamp ${t = Time.now; (t.to_i * 1000).to_s}
+      </record>
+    </filter>
+
     <match kubernetes.var.log.containers.app**_app**.log>
       @type copy
+
       <store>
         @type stdout
       </store>
@@ -54,6 +63,7 @@ data:
 
     <match kubernetes.var.log.containers.app**_goproxy**.log>
       @type copy
+
       <store>
         @type stdout
       </store>

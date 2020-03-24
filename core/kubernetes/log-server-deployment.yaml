@@ -18,4 +18,3 @@ spec:
           image: log-server:1.0
           ports:
           - containerPort: 3000
-          - containerPort: 3001
