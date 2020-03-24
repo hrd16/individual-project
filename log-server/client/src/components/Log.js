@@ -16,13 +16,13 @@ class Log extends Component {
         let messages = [];
         let messagesPerSecond = 200;
         let nodes = 5;
-        let duration = 5;
+        let duration = 60;
         let startTime = Date.now();
         let key = 0;
 
         for (let i = 0; i < duration * messagesPerSecond; i++) {
             for (let n = 0; n < nodes; n++) {
-                let timestamp = new Date(startTime - Math.round(Math.random() * duration * 1000));
+                let timestamp = new Date(startTime - Math.round(Math.random() * duration * 1000)).getTime();
                 messages.push({key: key++, timestamp: timestamp, node: `app-${n}`, msg: 'xyz'})
             }
         }
@@ -30,24 +30,25 @@ class Log extends Component {
     }
 
     addMessage(message) {
+        message.key = this.state.messages.length;
         this.setState(state => ({ messages: [message, ...state.messages]}));
     }
 
     componentDidMount() {
         this.ws.onopen = () => {
-            console.log('connected');
+            console.debug('connected');
         }
       
         this.ws.onmessage = evt => {
             const msgs = JSON.parse(evt.data);
-            console.log(msgs);
+            console.debug(msgs);
             msgs.forEach(msg => {
                 this.addMessage(msg);
             });
         }
       
           this.ws.onclose = () => {
-            console.log('disconnected');
+            console.debug('disconnected');
             this.setState({
               ws: new WebSocket(URL),
             });
@@ -61,7 +62,7 @@ class Log extends Component {
                 title: 'Timestamp',
                 dataIndex: 'timestamp',
                 width: 175,
-                render: (t, r, i) => dateFormat(r.timestamp, "H:MM:ss.l"),
+                render: (t, r, i) => dateFormat(new Date(parseInt(r.timestamp)), "H:MM:ss.l"),
                 defaultSortOrder: 'descend',
                 sorter: (a, b) => a.timestamp - b.timestamp,
             },
@@ -81,14 +82,6 @@ class Log extends Component {
                     {
                         text: 'app-2',
                         value: 'app-2'
-                    },
-                    {
-                        text: 'app-3',
-                        value: 'app-3'
-                    },
-                    {
-                        text: 'app-4',
-                        value: 'app-4'
                     }
                 ],
                 onFilter: (value, record) => record.node === value,

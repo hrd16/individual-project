@@ -34,7 +34,7 @@ data:
       @type record_transformer
       enable_ruby true
       <record>
-        timestamp ${t = Time.now; (t.to_i * 1000).to_s}
+        timestamp ${t = Time.now; (((t.to_i * 1000000000) + t.nsec) / 1000000).to_s}
       </record>
     </filter>
 
