@@ -4,7 +4,7 @@ const request = supertest(app);
 
 it('Posts app logs', async done => {
    request
-      .post('/api/app')
+      .post('/api/logging/app')
       .set('Content-Type', 'application/x-ndjson')
       .send(test_json)
       .expect(200)
@@ -16,7 +16,7 @@ it('Posts app logs', async done => {
 
 it('Posts proxy logs', async done => {
    request
-      .post('/api/proxy')
+      .post('/api/logging/proxy')
       .set('Content-Type', 'application/x-ndjson')
       .send(test_json)
       .expect(200)
