@@ -23,7 +23,7 @@ class Log extends Component {
         for (let i = 0; i < duration * messagesPerSecond; i++) {
             for (let n = 0; n < nodes; n++) {
                 let timestamp = new Date(startTime - Math.round(Math.random() * duration * 1000));
-                messages.push({key: key++, timestamp: timestamp, node: `app-${n}`, message: 'xyz'})
+                messages.push({key: key++, timestamp: timestamp, node: `app-${n}`, msg: 'xyz'})
             }
         }
         return messages;
@@ -95,7 +95,7 @@ class Log extends Component {
             },
             {
                 title: 'Output',
-                dataIndex: 'message',
+                dataIndex: 'msg',
             },
         ];
 

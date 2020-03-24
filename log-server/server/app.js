@@ -10,8 +10,10 @@ app.use(express.static('../client/build'));
 app.use(bodyParser.text( { type: 'application/x-ndjson', limit: '50mb' } ));
 
 let handler = new Handler();
-handler.subscribe('app', msg => console.log(msg));
+handler.subscribe('app', msg => console.debug(msg));
+
+require('./modules/ws.js')(handler, server);
 
 app.use('/api/logging', require('./modules/logging.js')(handler));
 
-module.exports = server
+module.exports = server;
