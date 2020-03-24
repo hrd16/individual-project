@@ -13,6 +13,7 @@
     "console-stamp": "^0.2.9",
     "express": "^4.17.1",
     "ndjson": "^1.5.0",
+    "stream": "0.0.2",
     "ws": "^7.2.3"
   },
   "devDependencies": {
