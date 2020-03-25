@@ -5,10 +5,10 @@ module.exports = function (handler, server) {
 
     let app_logs = [];
 
-    handler.subscribe('app', msg => {
-        app_logs.push(msg);
+    handler.subscribe('app', msgs => {
+        app_logs.concat(msgs);
         wss.clients.forEach(client => {
-            client.send(JSON.stringify([msg]));
+            client.send(JSON.stringify(msgs));
         });
     });
 
