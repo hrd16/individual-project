@@ -1,55 +1,50 @@
 import React from 'react';
 import Log from './components/Log'
-import { Layout, Menu } from 'antd';
-
-import {
-  ApartmentOutlined,
-  CommentOutlined,
-  BarChartOutlined
-} from '@ant-design/icons';
+import { Layout } from 'antd';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
 import './App.css';
+import LinkMenu from './components/LinkMenu';
 
 const { Header, Content, Footer, Sider } = Layout;
 
 function App() {
   return (
     <Layout>
-       <Sider
-        style={{
-          overflow: 'auto',
-          height: '100vh',
-          position: 'fixed',
-          left: 0,
-        }}
-      >
-        <div className="logo">
-          dashboard
-        </div>
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={['4']}>
-          <Menu.Item key="1">
-            <ApartmentOutlined />
-            <span className="nav-text">Nodes</span>
-          </Menu.Item>
-          <Menu.Item key="2">
-            <CommentOutlined />
-            <span className="nav-text">Messages</span>
-          </Menu.Item>
-          <Menu.Item key="3">
-            <BarChartOutlined />
-            <span className="nav-text">Metrics </span>
-          </Menu.Item>
-        </Menu>
-      </Sider>
-      <Layout className="site-layout" style={{ marginLeft: 200, height: '100vh' }}>
-        <Header className="site-layout-background" style={{ padding: 0 }} />
-        <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
-          <div className="site-layout-background" style={{ padding: 24, textAlign: 'center' }}>
-            <Log />
+      <Router>
+        <Sider
+          style={{
+            overflow: 'auto',
+            height: '100vh',
+            position: 'fixed',
+            left: 0,
+          }}
+        >
+          <div className="logo">
+            dashboard
           </div>
-        </Content>
-        <Footer style={{ textAlign: 'center' }}></Footer>
-      </Layout>
+          <LinkMenu />
+        </Sider>
+        <Layout className="site-layout" style={{ marginLeft: 200, height: '100vh' }}>
+          <Header className="site-layout-background" style={{ padding: 0 }} />
+          <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
+            <div className="site-layout-background" style={{ padding: 24, textAlign: 'center' }}>
+              <Switch>
+                <Route exact path="/nodes">
+                  <Log />
+                </Route>
+                <Route exact path="/messages">
+                  
+                </Route>
+                <Route exact path="/metrics">
+                  
+                </Route>
+              </Switch>
+            </div>
+          </Content>
+          <Footer style={{ textAlign: 'center' }}></Footer>
+        </Layout>
+      </Router>
     </Layout>
   );
 }
