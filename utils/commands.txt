@@ -3,3 +3,5 @@ nghttpx -b'127.0.0.1,4400;;proto=h2;no-tls' -f'127.0.0.1,4500;;no-tls' --accessl
 kubectl expose deployment log-server --type="NodePort" --name=test-service -n 9bc6bdfaf0e64c85a21c10bb4ae23da0 --port 3000
 
 kubectl describe service test-service -n 9bc6bdfaf0e64c85a21c10bb4ae23da0
+
+for i in {1..100}; do sleep 1; if nslookup app-service.a97a0f60dfe946d8a0dc3a948b526a9f.svc.cluster.local; then exit 0; fi; done; exit 1

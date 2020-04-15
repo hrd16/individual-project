@@ -9,7 +9,6 @@ import grpc
 import erb_pb2
 import erb_pb2_grpc
 
-PROXY_PORT = 4500
 BIND_PORT = 4400
 
 ch = logging.StreamHandler()
@@ -64,18 +63,8 @@ def heartbeat(exit_flag, nodes):
 
 
 if __name__ == '__main__':
-    sim = len(sys.argv) >= 3
-    num_replicas = int(sys.argv[1]) if sim else 1
-    hostname = sys.argv[2] if sim else '127.0.0.1'
-    namespace = sys.argv[3] if sim else 'default'
-
-    logger.info(f'Replicas: {num_replicas}')
-    logger.info(f'Hostname: {hostname}')
-    logger.info(f'Namespace: {namespace}')
-
-    nodes = [f'{hostname}:{PROXY_PORT}']
-    if sim:
-        nodes = [f'app-{i}.app-service.{namespace}.svc.cluster.local:{PROXY_PORT}' for i in range(num_replicas)]
+    with open('/var/config/network.conf', 'r') as f:
+        nodes = f.read().splitlines()
 
     logger.info(nodes)
 

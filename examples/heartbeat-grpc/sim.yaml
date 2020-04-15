@@ -1,3 +1,4 @@
 replicas: 3
 latency: 100
 dropRate: 0
+network: star

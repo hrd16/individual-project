@@ -1,0 +1,1 @@
+docker build -t init-config:1.0 .

@@ -19,4 +19,5 @@ RUN pipenv install --system --deploy --ignore-pipfile
 FROM builder
 
 WORKDIR /app/
+
 ADD . .

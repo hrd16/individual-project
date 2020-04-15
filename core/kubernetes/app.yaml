@@ -26,9 +26,20 @@ spec:
         app: app-service
     spec:
       terminationGracePeriodSeconds: 10
+      initContainers:
+        - name: init-config
+          image: init-config:1.0
+          volumeMounts:
+            - name: configdir
+              mountPath: "/var/config"
+          command: ["echo"]
+          args: ["xyz", ">", "network.conf"]
       containers:
         - name: app
           image: app:1.0
+          volumeMounts:
+            - name: configdir
+              mountPath: "/var/config"
           env:
             - name: POD_IP
               valueFrom:
@@ -41,3 +52,6 @@ spec:
         - name: app-proxy
           image: app-proxy:1.0
           args: ["3", "default"]
+      volumes:
+        - name: configdir
+          emptyDir: {}

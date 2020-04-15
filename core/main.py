@@ -62,17 +62,33 @@ def create_service(api_client, namespace):
     api_client.create_namespaced_service(body=service_yaml, namespace=namespace)
 
 def create_deployment(api_client, namespace, replicas, latency, dropRate):
-    # Container
-    pod_ip_fs = client.V1ObjectFieldSelector(field_path="status.podIP")
-    pod_ip_src = client.V1EnvVarSource(field_ref=pod_ip_fs)
-    pod_ip_env = client.V1EnvVar(name="POD_IP", value_from=pod_ip_src)
+    # Volume
+    volume = client.V1Volume(name="configvol")
 
+    # Env Vars
     pod_ns_fs = client.V1ObjectFieldSelector(field_path="metadata.namespace")
     pod_ns_src = client.V1EnvVarSource(field_ref=pod_ns_fs)
     pod_ns_env = client.V1EnvVar(name="POD_NAMESPACE", value_from=pod_ns_src)
 
+    pod_n_fs = client.V1ObjectFieldSelector(field_path="metadata.name")
+    pod_n_src = client.V1EnvVarSource(field_ref=pod_n_fs)
+    pod_n_env = client.V1EnvVar(name="POD_NAME", value_from=pod_n_src)
+
+    # Init Container
+    init_container_volume = client.V1VolumeMount(name="configvol", mount_path="/var/config", read_only=False)
+
+    init_container_spec = client.V1Container(name="init", image="init-config:1.0", command=["python3"],
+        args=["network.py", str(replicas), "$(POD_NAMESPACE)", "$(POD_NAME)"], env=[pod_ns_env, pod_n_env],
+        volume_mounts=[init_container_volume])
+
+    # wait_service_container_spec = client.V1Container(name="init-wait-service", image="busybox", 
+    #     command=['sh'], args=['-c', f'for i in {{1..20}}; do sleep 1; if nslookup app-service.{namespace}.svc.cluster.local; then exit 0; fi; done; exit 1'])
+
+    # Container
+    app_container_volume = client.V1VolumeMount(name="configvol", mount_path="/var/config", read_only=False)
+
     app_container_spec = client.V1Container(name="app", image="app:1.0", command=["python3"], 
-        args=["app.py", str(replicas), "$(POD_IP)", "$(POD_NAMESPACE)"], env=[pod_ip_env, pod_ns_env])
+        args=["app.py"], volume_mounts=[app_container_volume])
 
     # HAProxy Container
     haproxy_container_spec = client.V1Container(name="haproxy", image="app-haproxy:1.0")
@@ -83,7 +99,9 @@ def create_deployment(api_client, namespace, replicas, latency, dropRate):
 
     # Pod
     pod_spec = client.V1PodSpec(termination_grace_period_seconds=10, 
-        containers=[app_container_spec, haproxy_container_spec, app_proxy_container_spec])
+        containers=[app_container_spec, haproxy_container_spec, app_proxy_container_spec],
+        init_containers=[init_container_spec],
+        volumes=[volume])
     pod_metadata = client.V1ObjectMeta(labels={"app": "app-service"})
     pod_template_spec = client.V1PodTemplateSpec(metadata=pod_metadata, spec=pod_spec)
 
@@ -131,3 +149,5 @@ if __name__ == "__main__":
     latency = sim_config.get('latency', 0)
     dropRate = sim_config.get('dropRate', 0)
     create_deployment(apps_v1, namespace, sim_config['replicas'], latency, dropRate)
+
+    print(f'Web app hosted on http://localhost:31234')
