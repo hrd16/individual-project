@@ -2,18 +2,15 @@ import React, { Component } from 'react';
 import { Table, Input, Button } from 'antd';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
+import wsm from '../wsm';
 
 var dateFormat = require('dateformat');
-
-const URL = 'ws://localhost:31234/api/ws';
 
 class Log extends Component {
 
     state = {
         messages: [] //this.testData()
     }
-
-    ws = new WebSocket(URL);
 
     testData() {
         let messages = [];
@@ -38,24 +35,18 @@ class Log extends Component {
     }
 
     componentDidMount() {
-        this.ws.onopen = () => {
-            console.debug('connected');
+        wsm.ws.onmessage = evt => {
+          const data = JSON.parse(evt.data);
+          if (data.type !== 'node') {
+            return;
+          }
+
+          const msgs = data.val;
+          console.debug(msgs);
+          msgs.forEach(msg => {
+              this.addMessage(msg);
+          });
         }
-      
-        this.ws.onmessage = evt => {
-            const msgs = JSON.parse(evt.data);
-            console.debug(msgs);
-            msgs.forEach(msg => {
-                this.addMessage(msg);
-            });
-        }
-      
-          this.ws.onclose = () => {
-            console.debug('disconnected');
-            this.setState({
-              ws: new WebSocket(URL),
-            });
-          };
     }
 
     getColumnSearchProps = dataIndex => ({

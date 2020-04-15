@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
 import './App.css';
 import LinkMenu from './components/LinkMenu';
+import Metrics from './components/Metrics';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -37,7 +38,7 @@ function App() {
                   
                 </Route>
                 <Route exact path="/metrics">
-                  
+                  <Metrics />
                 </Route>
               </Switch>
             </div>
