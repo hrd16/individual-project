@@ -1,5 +1,4 @@
 import sys
-import pathlib
 
 PROXY_PORT = 4500
 
@@ -58,17 +57,21 @@ if __name__ == "__main__":
     replicas = int(sys.argv[1])
     namespace = sys.argv[2]
     ordinal = int(sys.argv[3].split('-')[1])
+    network_str = sys.argv[4]
+
+    network_str = network_str.replace("\\n", "\n")
+    network_str = network_str.strip("\'")
 
     print(f'Init pod {ordinal} of {replicas}')
 
     network = Network(replicas)
-    create_star(network)
+   
+    cc = compile(network_str, 'temp', 'exec')
+    exec(cc)
+
     node = network.get_node(ordinal)
-
-    out_file = '/var/config/network.conf'
-
-    pathlib.Path("/var/config").mkdir(parents=True, exist_ok=True)
-
-    with open(out_file, 'w') as f:
+    
+    with open('/var/config/network.conf', 'w') as f:
         for i in node.edges:
             f.write(f'app-{i}.app-service.{namespace}.svc.cluster.local:{PROXY_PORT}\n')
+

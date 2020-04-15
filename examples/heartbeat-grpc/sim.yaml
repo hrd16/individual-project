@@ -1,4 +1,9 @@
 replicas: 3
 latency: 100
 dropRate: 0
-network: star
+network: |
+  for i in range(network.num_nodes()):
+    for j in range(network.num_nodes()):
+        if i != j:
+            network.get_node(i).add_edge(j)
+            network.get_node(j).add_edge(i)

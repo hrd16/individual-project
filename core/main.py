@@ -9,6 +9,7 @@ from os import path
 import uuid
 from pprint import pprint
 import argparse
+import shlex
 
 def pre_process(src_dir, out_dir):
     copy_tree(src_dir, out_dir)
@@ -61,7 +62,7 @@ def create_service(api_client, namespace):
 
     api_client.create_namespaced_service(body=service_yaml, namespace=namespace)
 
-def create_deployment(api_client, namespace, replicas, latency, dropRate):
+def create_deployment(api_client, namespace, replicas, latency, dropRate, network):
     # Volume
     volume = client.V1Volume(name="configvol")
 
@@ -78,7 +79,7 @@ def create_deployment(api_client, namespace, replicas, latency, dropRate):
     init_container_volume = client.V1VolumeMount(name="configvol", mount_path="/var/config", read_only=False)
 
     init_container_spec = client.V1Container(name="init", image="init-config:1.0", command=["python3"],
-        args=["network.py", str(replicas), "$(POD_NAMESPACE)", "$(POD_NAME)"], env=[pod_ns_env, pod_n_env],
+        args=["network.py", str(replicas), "$(POD_NAMESPACE)", "$(POD_NAME)", network], env=[pod_ns_env, pod_n_env],
         volume_mounts=[init_container_volume])
 
     # wait_service_container_spec = client.V1Container(name="init-wait-service", image="busybox", 
@@ -148,6 +149,6 @@ if __name__ == "__main__":
     print('Create app deployment')
     latency = sim_config.get('latency', 0)
     dropRate = sim_config.get('dropRate', 0)
-    create_deployment(apps_v1, namespace, sim_config['replicas'], latency, dropRate)
+    create_deployment(apps_v1, namespace, sim_config['replicas'], latency, dropRate, shlex.quote(sim_config['network']))
 
     print(f'Web app hosted on http://localhost:31234')
