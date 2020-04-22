@@ -1,0 +1,18 @@
+FROM elixir:alpine as base
+
+FROM base as withbash
+
+FROM withbash as builder
+
+WORKDIR /app/
+
+ADD . .
+
+RUN mix clean
+RUN mix compile
+
+FROM builder
+
+WORKDIR /app/
+
+EXPOSE 4369

@@ -1,6 +1,7 @@
 FROM python:3.7-alpine as base
 
-FROM base as builder
+FROM base as withbash
+
 RUN apk add --update --no-cache \
     gcc \
     linux-headers \
@@ -8,6 +9,10 @@ RUN apk add --update --no-cache \
     musl-dev \
     python-dev \
     g++
+
+FROM withbash as builder
+
+WORKDIR /app/
 
 COPY Pipfile .
 COPY Pipfile.lock .

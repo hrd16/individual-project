@@ -10,6 +10,7 @@ import erb_pb2
 import erb_pb2_grpc
 
 BIND_PORT = 4400
+PROXY_PORT = 4500
 
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
@@ -38,7 +39,7 @@ def heartbeat(exit_flag, nodes):
     interval = 1.0
     timeout = 3.0
     last_seen = {node: time.time() for node in nodes}
-    channels = {node: grpc.insecure_channel(node) for node in nodes}
+    channels = {node: grpc.insecure_channel(f'{node}:{PROXY_PORT}') for node in nodes}
 
     def update_heartbeat(node, call_future):
         try:
