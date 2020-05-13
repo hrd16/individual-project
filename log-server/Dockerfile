@@ -12,4 +12,3 @@ COPY --from=builder /app/build ../client/build
 COPY server/package*.json ./
 RUN npm install
 COPY server .
-CMD [ "node", "server.js" ]

@@ -8,7 +8,16 @@ var dateFormat = require('dateformat');
 class Log extends Component {
 
   state = {
+    messages: this.props.nodeHandler.messages
+  }
 
+  constructor(props) {
+    super(props);
+    props.nodeHandler.subscribeToMessages(this.handleMessagesChange);
+  }
+
+  handleMessagesChange = (messages) => {
+    this.setState(state => ({...state, messages: messages}))
   }
 
   getColumnSearchProps = dataIndex => ({
@@ -113,11 +122,9 @@ class Log extends Component {
       },
     ];
 
-    console.log(this.props);
-
     return (
       <div>
-        <Table dataSource={this.props.messages} columns={columns} pagination={{ pageSize: 50 }} />
+        <Table dataSource={this.state.messages} columns={columns} pagination={{ pageSize: 50 }} />
       </div>
     )
   }

@@ -3,6 +3,19 @@ import { Table } from 'antd';
 
 class Metrics extends Component {
 
+    state = {
+        metrics: this.props.metricsHandler.metrics
+    }
+    
+    constructor(props) {
+        super(props);
+        props.metricsHandler.subscribeToMetrics(this.handleMetricsChange);
+    }
+
+    handleMetricsChange = (metrics) => {
+        this.setState(state => ({...state, metrics: metrics}))
+    }
+
     render() {
         const columns = [
             {
@@ -35,7 +48,7 @@ class Metrics extends Component {
 
         return (
             <div>
-                <Table dataSource={this.props.metrics} columns={columns} pagination={{ pageSize: 50 }} />
+                <Table dataSource={this.state.metrics} columns={columns} pagination={{ pageSize: 50 }} />
             </div>
         )
     }

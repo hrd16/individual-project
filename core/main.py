@@ -11,6 +11,7 @@ from pprint import pprint
 import argparse
 import os
 import shlex
+import json
 
 def pre_process(dockerfile, src_dir, out_dir):
     copy_tree(src_dir, out_dir)
@@ -34,7 +35,7 @@ def create_namespace(api_client, namespace):
     body = client.V1Namespace(metadata=metadata)
     api_client.create_namespace(body=body)
 
-def create_log_server(core_v1, apps_v1, namespace):
+def create_log_server(core_v1, apps_v1, namespace, sim_config):
     with open(path.join(path.dirname(__file__), "kubernetes", "log-server-service.yaml")) as f:
         service_yaml = yaml.safe_load(f)
 
@@ -46,7 +47,26 @@ def create_log_server(core_v1, apps_v1, namespace):
 
     core_v1.create_namespaced_service(body=service_yaml, namespace=namespace)
     core_v1.create_namespaced_service(body=frontend_service_yaml, namespace=namespace)
-    apps_v1.create_namespaced_deployment(body=deployment_yaml, namespace=namespace)
+    #apps_v1.create_namespaced_deployment(body=deployment_yaml, namespace=namespace)
+
+    config_str = shlex.quote(json.dumps(sim_config))
+
+    # Container
+    server_container_spec = client.V1Container(name="log-server", image="log-server:1.0", ports=[client.V1ContainerPort(container_port=3000)],
+        command=["node"], args=["server.js", namespace, config_str])
+
+    # Pod
+    pod_spec = client.V1PodSpec(termination_grace_period_seconds=10, containers=[server_container_spec])
+    pod_metadata = client.V1ObjectMeta(labels={"deploy": "log-service", "run": "log-service"})
+    pod_template_spec = client.V1PodTemplateSpec(metadata=pod_metadata, spec=pod_spec)
+    selector = client.V1LabelSelector(match_labels={"deploy": "log-service"})
+
+    # Deployment
+    deployment_spec = client.V1DeploymentSpec(replicas=1, template=pod_template_spec, selector=selector)
+    metadata = client.V1ObjectMeta(name='log-server')
+    deployment = client.V1Deployment(spec=deployment_spec, metadata=metadata)
+
+    apps_v1.create_namespaced_deployment(namespace=namespace, body=deployment)
 
 def create_fluentd(core_v1, apps_v1, namespace):
     with open(path.join(path.dirname(__file__), "kubernetes", "fluentd-config.yaml")) as f:
@@ -205,7 +225,7 @@ if __name__ == "__main__":
     create_namespace(core_v1, namespace)
 
     print('Create log server')
-    create_log_server(core_v1, apps_v1, namespace)
+    create_log_server(core_v1, apps_v1, namespace, sim_config)
 
     print('Create fluentd')
     create_fluentd(core_v1, apps_v1_ext, namespace)

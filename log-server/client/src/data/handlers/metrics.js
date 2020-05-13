@@ -1,16 +1,24 @@
 class MetricsHandler {
 
     metrics = [];
+    listeners = [];
 
     onMessage(data) {
         const metrics = data.val;
-        console.debug(metrics);
 
         for (let i = 0; i < metrics.length; i++) {
           metrics[i].key = i;
         }
 
         this.metrics = metrics;
+
+        this.listeners.forEach(handler => {
+            handler(this.metrics);
+        });
+    }
+
+    subscribeToMetrics(handler) {
+        this.listeners.push(handler);
     }
 
     testData() {
