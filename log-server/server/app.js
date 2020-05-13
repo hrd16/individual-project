@@ -21,9 +21,10 @@ app.use(express.static('../client/build'));
 app.use(bodyParser.text( { type: 'application/x-ndjson', limit: '50mb' } ));
 
 let handler = new Handler();
-handler.subscribe('app', msg => console.debug(msg));
+//handler.subscribe('app', msg => console.debug(msg));
 
 require('./modules/ws.js')(handler, server);
+require('./modules/filesys.js')(handler);
 
 app.use('/api/logging', require('./modules/logging.js')(handler));
 app.use('/api/sim', require('./modules/sim.js')(sim_config));

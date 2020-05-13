@@ -51,12 +51,16 @@ def create_log_server(core_v1, apps_v1, namespace, sim_config):
 
     config_str = shlex.quote(json.dumps(sim_config))
 
+    container_volume = client.V1VolumeMount(name='logvol', mount_path="/var/simul", read_only=False)
+    host_volume_source = client.V1HostPathVolumeSource(path=path.join("/Users/hrd/Documents/University/distributed-algorithms/logs", namespace), type="DirectoryOrCreate")
+    host_volume = client.V1Volume(name='logvol', host_path=host_volume_source)
+
     # Container
     server_container_spec = client.V1Container(name="log-server", image="log-server:1.0", ports=[client.V1ContainerPort(container_port=3000)],
-        command=["node"], args=["server.js", namespace, config_str])
+        command=["node"], args=["server.js", namespace, config_str], volume_mounts=[container_volume])
 
     # Pod
-    pod_spec = client.V1PodSpec(termination_grace_period_seconds=10, containers=[server_container_spec])
+    pod_spec = client.V1PodSpec(termination_grace_period_seconds=10, containers=[server_container_spec], volumes=[host_volume])
     pod_metadata = client.V1ObjectMeta(labels={"deploy": "log-service", "run": "log-service"})
     pod_template_spec = client.V1PodTemplateSpec(metadata=pod_metadata, spec=pod_spec)
     selector = client.V1LabelSelector(match_labels={"deploy": "log-service"})
