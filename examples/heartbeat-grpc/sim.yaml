@@ -5,3 +5,10 @@ server:
   latency: 100
   dropRate: 0
   network: create_star(network)
+  events:
+  - type: kill
+    selector: app-0
+    time: 30000
+  - type: kill
+    selector: app-.*
+    time: 60000
