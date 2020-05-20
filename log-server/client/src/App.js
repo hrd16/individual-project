@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Log from './components/Log'
-import { Layout } from 'antd';
+import { Layout, Spin } from 'antd';
 import { MemoryRouter as Router, Switch, Route } from 'react-router-dom'
 import axios from 'axios';
 import './App.css';
@@ -20,7 +20,9 @@ class App extends Component {
 
   componentDidMount() {
     axios.get('http://localhost:31234/api/sim/config')
-      .then(res => this.setConfig(res.data))
+      .then(res => {
+        this.setConfig(res.data)
+      })
       .catch(err => console.error(err));
   }
 
@@ -29,6 +31,30 @@ class App extends Component {
   }
 
   render() {
+    let content = <Spin></Spin>;
+
+    if (this.state.config.params !== undefined) {
+      content = (
+        <Switch>
+          <Route exact path="/">
+            <Dashboard config={this.state.config} />
+          </Route>
+
+          <Route exact path="/nodes">
+            <Log nodeHandler={this.wsm.nodeHandler} config={this.state.config} />
+          </Route>
+
+          <Route exact path="/messages">
+            
+          </Route>
+
+          <Route exact path="/metrics">
+            <Metrics metricsHandler={this.wsm.metricsHandler} config={this.state.config} />
+          </Route>
+        </Switch>
+      );
+    }
+
     return (
       <Layout>
         <Router>
@@ -46,23 +72,7 @@ class App extends Component {
             <Header className="site-layout-background" style={{ padding: 0 }} />
             <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
               <div className="site-layout-background" style={{ padding: 24, textAlign: 'center' }}>
-                <Switch>
-                  <Route exact path="/">
-                    <Dashboard config={this.state.config} />
-                  </Route>
-
-                  <Route exact path="/nodes">
-                    <Log nodeHandler={this.wsm.nodeHandler} />
-                  </Route>
-
-                  <Route exact path="/messages">
-                    
-                  </Route>
-
-                  <Route exact path="/metrics">
-                    <Metrics metricsHandler={this.wsm.metricsHandler} />
-                  </Route>
-                </Switch>
+                {content}
               </div>
             </Content>
             <Footer style={{ textAlign: 'center' }}></Footer>

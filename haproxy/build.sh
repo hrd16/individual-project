@@ -1,0 +1,1 @@
+docker build -t app-haproxy:1.0 .

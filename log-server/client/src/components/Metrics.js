@@ -22,20 +22,26 @@ class Metrics extends Component {
                 title: 'Node',
                 dataIndex: 'node',
                 width: 175,
-                filters: [
-                    {
-                        text: 'app-0',
-                        value: 'app-0'
-                    },
-                    {
-                        text: 'app-1',
-                        value: 'app-1'
-                    },
-                    {
-                        text: 'app-2',
-                        value: 'app-2'
-                    }
-                ],
+                filters: Array.from(Array(this.props.config.params.server.replicas).keys()).map(i => {
+                    return {
+                        text: `app-${i}`,
+                        value: `app-${i}`
+                    };
+                }),
+                // [
+                //     {
+                //         text: 'app-0',
+                //         value: 'app-0'
+                //     },
+                //     {
+                //         text: 'app-1',
+                //         value: 'app-1'
+                //     },
+                //     {
+                //         text: 'app-2',
+                //         value: 'app-2'
+                //     }
+                // ],
                 onFilter: (value, record) => record.node === value,
             },
             {
