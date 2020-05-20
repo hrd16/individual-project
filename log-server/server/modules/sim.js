@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const k8s = require('@kubernetes/client-node');
 
 const kc = new k8s.KubeConfig();
@@ -8,15 +9,20 @@ const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
 module.exports = function (sim_config) {
     const router = express.Router();
 
+    router.use(bodyParser.json())
+
     let podNames = genPodNames(sim_config.params.server.replicas);
     handleEvents(sim_config, podNames);
 
-    // setTimeout(() => {
-    //     k8sApi.listNamespacedPod(namespace=sim_config)
-    // }, 30000);
-
     router.get(`/config`, function (req, res) {
         res.send(JSON.stringify(sim_config));
+    });
+
+    router.post(`/kill-pod`, function (req, res) {
+        let podName = req.body.podName;
+        console.debug(`Kill Pod Request: ${podName}`);
+        k8sApi.deleteNamespacedPod(name=podName, namespace=sim_config.namespace)
+        res.send('');
     });
 
     return router;
@@ -47,6 +53,7 @@ let typeFuncs = {
 };
 
 function killPod(sim_config, podNames) {
+    console.debug(`Kill Pods ${JSON.stringify(podNames)}`);
     for (let podName of podNames) {
         k8sApi.deleteNamespacedPod(name=podName, namespace=sim_config.namespace)
     }

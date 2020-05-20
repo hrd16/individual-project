@@ -1,9 +1,12 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 var ndjson = require('ndjson');
 const { Readable } = require('stream');
 
 module.exports = function (handler) {
     const router = express.Router();
+
+    router.use(bodyParser.text( { type: 'application/x-ndjson', limit: '50mb' } ));
 
     function log(tag) {
         router.post(`/${tag}`, function (req, res) {
