@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+service Chord {
+    rpc PutKey (GetKeyRequest) returns (PutKeyResponse);
+    rpc GetKey (PutKeyRequest) returns (GetKeyResponse);
+    rpc FindSuccessor (Key) returns (Node);
+}
+
+message PutKeyRequest {
+    Key key = 1;
+    Value val = 2;
+}
+
+message PutKeyResponse {
+
+}
+
+message GetKeyRequest {
+    Key key = 1;
+}
+
+message GetKeyResponse {
+    Value val = 1;
+}
+
+message Node {
+    fixed32 ipv4 = 1;
+}
+  
+message Key {
+    string key = 1;
+}
+
+message Value {
+    string value = 1;
+}

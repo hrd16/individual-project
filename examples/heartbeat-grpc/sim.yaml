@@ -11,4 +11,4 @@ server:
     time: 30000
   - type: kill
     selector: app-.*
-    time: 60000
+    time: 90000
