@@ -15,13 +15,13 @@ class ChordStub(object):
         """
         self.PutKey = channel.unary_unary(
                 '/Chord/PutKey',
-                request_serializer=chord__pb2.GetKeyRequest.SerializeToString,
-                response_deserializer=chord__pb2.PutKeyResponse.FromString,
+                request_serializer=chord__pb2.PutKeyRequest.SerializeToString,
+                response_deserializer=chord__pb2.GetKeyResponse.FromString,
                 )
         self.GetKey = channel.unary_unary(
                 '/Chord/GetKey',
-                request_serializer=chord__pb2.PutKeyRequest.SerializeToString,
-                response_deserializer=chord__pb2.GetKeyResponse.FromString,
+                request_serializer=chord__pb2.GetKeyRequest.SerializeToString,
+                response_deserializer=chord__pb2.PutKeyResponse.FromString,
                 )
         self.Ping = channel.unary_unary(
                 '/Chord/Ping',
@@ -91,13 +91,13 @@ def add_ChordServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'PutKey': grpc.unary_unary_rpc_method_handler(
                     servicer.PutKey,
-                    request_deserializer=chord__pb2.GetKeyRequest.FromString,
-                    response_serializer=chord__pb2.PutKeyResponse.SerializeToString,
+                    request_deserializer=chord__pb2.PutKeyRequest.FromString,
+                    response_serializer=chord__pb2.GetKeyResponse.SerializeToString,
             ),
             'GetKey': grpc.unary_unary_rpc_method_handler(
                     servicer.GetKey,
-                    request_deserializer=chord__pb2.PutKeyRequest.FromString,
-                    response_serializer=chord__pb2.GetKeyResponse.SerializeToString,
+                    request_deserializer=chord__pb2.GetKeyRequest.FromString,
+                    response_serializer=chord__pb2.PutKeyResponse.SerializeToString,
             ),
             'Ping': grpc.unary_unary_rpc_method_handler(
                     servicer.Ping,
@@ -140,8 +140,8 @@ class Chord(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/Chord/PutKey',
-            chord__pb2.GetKeyRequest.SerializeToString,
-            chord__pb2.PutKeyResponse.FromString,
+            chord__pb2.PutKeyRequest.SerializeToString,
+            chord__pb2.GetKeyResponse.FromString,
             options, channel_credentials,
             call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -156,8 +156,8 @@ class Chord(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/Chord/GetKey',
-            chord__pb2.PutKeyRequest.SerializeToString,
-            chord__pb2.GetKeyResponse.FromString,
+            chord__pb2.GetKeyRequest.SerializeToString,
+            chord__pb2.PutKeyResponse.FromString,
             options, channel_credentials,
             call_credentials, compression, wait_for_ready, timeout, metadata)
 

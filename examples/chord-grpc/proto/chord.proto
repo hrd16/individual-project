@@ -2,8 +2,8 @@ syntax = "proto3";
 
 service Chord {
     // Application level
-    rpc PutKey (GetKeyRequest) returns (PutKeyResponse);
-    rpc GetKey (PutKeyRequest) returns (GetKeyResponse);
+    rpc PutKey (PutKeyRequest) returns (PutKeyResponse);
+    rpc GetKey (GetKeyRequest) returns (GetKeyResponse);
 
     // Protocol level
     rpc Ping (Empty) returns (Empty);
@@ -39,11 +39,11 @@ message Node {
 }
   
 message Key {
-    uint32 key = 1;
+    uint32 id = 1;
 }
 
 message Value {
-    string value = 1;
+    bytes value = 1;
 }
 
 message Empty {

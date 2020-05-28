@@ -15,7 +15,7 @@ data:
       time_format %Y-%m-%dT%H:%M:%S.%NZ
       tag kubernetes.*
       format json
-      read_from_head false
+      read_from_head true
     </source>
 
     <filter kubernetes.**>
@@ -56,6 +56,7 @@ data:
         </format>
         
         <buffer>
+          flush_thread_count 8
           flush_interval 1s
         </buffer>
       </store>
@@ -79,6 +80,7 @@ data:
         </format>
         
         <buffer>
+          flush_thread_count 8
           flush_interval 1s
         </buffer>
       </store>

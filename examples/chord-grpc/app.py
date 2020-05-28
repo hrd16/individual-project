@@ -31,10 +31,13 @@ class ChordServer(chord_pb2_grpc.ChordServicer):
     predecessor = None
     lock = threading.Lock()
 
+    hash_table = {}
+
     def __init__(self, ip, idx):
         self.node = chord_pb2.Node(ip=ip, id=sha1_hash(f'{ip}-{idx}'))
 
     def join(self, ring_node=None):
+        logger.info(f'join {ring_node}'.replace('\n', ' '))
         if ring_node is not None:
             while True:
                 try:
@@ -49,19 +52,40 @@ class ChordServer(chord_pb2_grpc.ChordServicer):
             logger.info('Ring node alive')
 
         if ring_node is not None:
-            self.successor = call_find_successor(ring_node, chord_pb2.Key(key=self.node.id))
+            self.successor = call_find_successor(ring_node, chord_pb2.Key(id=self.node.id))
         else:
             self.successor = self.node
+
+        assert self.successor != None
 
         self.predecessor = self.get_successor_pred()
 
         logger.info(f'created {self}')
 
     def PutKey(self, request, context):
+        logger.info(f'PutKey {request}'.replace('\n', ' '))
+        key = request.key
+        keyNode = call_find_successor(self.successor, key)
+
+        if self.node.id == keyNode.id:
+            self.hash_table[key.id] = request.val.value
+        else:
+            return call_put_key(keyNode, request)
+
         return chord_pb2.PutKeyResponse()
 
     def GetKey(self, request, context):
-        return chord_pb2.GetKeyResponse()
+        logger.info(f'GetKey {request}'.replace('\n', ' '))
+        key = request.key
+        keyNode = call_find_successor(self.successor, key)
+
+        if self.node.id == keyNode.id:
+            if key.id in self.hash_table:
+                return chord_pb2.GetKeyResponse(val=chord_pb2.Value(value=self.hash_table[key.id]))
+            else:
+                return chord_pb2.GetKeyResponse()
+        else:
+            return call_get_key(keyNode, request)
 
     def Ping(self, request, context):
         logger.info('Ping')
@@ -69,7 +93,7 @@ class ChordServer(chord_pb2_grpc.ChordServicer):
 
     def FindSuccessor(self, request, context):
         logger.info(f'FindSuccessor {request}'.replace('\n', ' '))
-        keyId = request.key
+        keyId = request.id
 
         if (is_between(keyId, self.node.id, self.successor.id) 
                 or keyId == self.node.id 
@@ -123,6 +147,22 @@ def is_between(val, lower, upper):
     else:
         return lower < val or val < upper
 
+def call_get_key(node, request):
+    try:
+        channel = grpc.insecure_channel(f'{node.ip}:{PROXY_PORT}')
+        stub = chord_pb2_grpc.ChordStub(channel)
+        return stub.GetKey(request)
+    except Exception as e:
+        logger.error(e)
+
+def call_put_key(node, request):
+    try:
+        channel = grpc.insecure_channel(f'{node.ip}:{PROXY_PORT}')
+        stub = chord_pb2_grpc.ChordStub(channel)
+        return stub.PutKey(request)
+    except Exception as e:
+        logger.error(e)
+
 def call_find_successor(node, request):
     try:
         channel = grpc.insecure_channel(f'{node.ip}:{PROXY_PORT}')
@@ -157,11 +197,6 @@ def serve(chord_server, port):
 
 
 if __name__ == '__main__':
-    assert is_between(100, 150, 200) == False
-    assert is_between(150, 100, 200) == True
-
-    logger.info('APP')
-
     # idx = int(sys.argv[1])
     idx = 0
     port = PROXY_PORT + idx
@@ -180,22 +215,37 @@ if __name__ == '__main__':
     if idx == 0:
         chord_server = ChordServer(hostname, idx)
     else:
+        time.sleep(10)
         chord_server = ChordServer(hostname, idx)
 
     def stabilize():
-        while True:
-            time.sleep(1)
+        try:
+            while True:
+                time.sleep(1)
 
-            chord_server.stabilize()
-            logger.info(chord_server)
+                chord_server.stabilize()
+                logger.info(chord_server)
+        except Exception as e:
+            logger.info(f'Stablizize thread died {e}')
 
     server = serve(chord_server, port)
-
-    logger.info('Sleeping')
-    time.sleep(10)
-
     stabilize_thread = threading.Thread(target=stabilize)
     chord_server.join(chord_pb2.Node(ip=nodes[0]) if idx > 0 else None)
     stabilize_thread.start()
+
+    if idx == 0:
+        time.sleep(20)
+        logger.info('Putting')
+        channel = grpc.insecure_channel(f'{chord_server.node.ip}:{PROXY_PORT}')
+        stub = chord_pb2_grpc.ChordStub(channel)
+        stub.PutKey(chord_pb2.PutKeyRequest(key=chord_pb2.Key(id=idx), val=chord_pb2.Value(value=b'hello world')))
+
+        time.sleep(5)
+
+        logger.info('Getting')
+        channel = grpc.insecure_channel(f'{chord_server.node.ip}:{PROXY_PORT}')
+        stub = chord_pb2_grpc.ChordStub(channel)
+        res = stub.GetKey(chord_pb2.GetKeyRequest(key=chord_pb2.Key(id=idx)))
+        logger.info(f'Get result {res.val.value}')
 
     server.wait_for_termination()

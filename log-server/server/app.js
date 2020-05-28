@@ -25,7 +25,7 @@ let handler = new Handler();
 require('./modules/ws.js')(handler, server);
 require('./modules/filesys.js')(handler);
 
-app.use('/api/logging', require('./modules/logging.js')(handler));
+app.use('/api/logging', require('./modules/logging.js')(handler, namespace));
 app.use('/api/sim', require('./modules/sim.js')(sim_config));
 
 module.exports = server;
