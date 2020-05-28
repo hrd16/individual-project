@@ -1,0 +1,8 @@
+runtime: python
+server:
+  replicas: 3
+  command: python app.py
+  latency: 0
+  dropRate: 0
+  network: create_star(network)
+  events: []

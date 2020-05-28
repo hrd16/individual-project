@@ -1,9 +1,18 @@
 syntax = "proto3";
 
 service Chord {
+    // Application level
     rpc PutKey (GetKeyRequest) returns (PutKeyResponse);
     rpc GetKey (PutKeyRequest) returns (GetKeyResponse);
+
+    // Protocol level
     rpc FindSuccessor (Key) returns (Node);
+    rpc Notify (Node) returns (Empty);
+    rpc GetPredecessor (Empty) returns (GetPredecessorResponse);
+}
+
+message GetPredecessorResponse {
+    Node node = 1;
 }
 
 message PutKeyRequest {
@@ -24,13 +33,18 @@ message GetKeyResponse {
 }
 
 message Node {
-    fixed32 ipv4 = 1;
+    string ip = 1;
+    uint32 id = 2;
 }
   
 message Key {
-    string key = 1;
+    uint32 key = 1;
 }
 
 message Value {
     string value = 1;
+}
+
+message Empty {
+
 }

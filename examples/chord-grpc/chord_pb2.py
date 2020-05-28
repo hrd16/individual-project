@@ -18,10 +18,41 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x0b\x63hord.proto\"7\n\rPutKeyRequest\x12\x11\n\x03key\x18\x01 \x01(\x0b\x32\x04.Key\x12\x13\n\x03val\x18\x02 \x01(\x0b\x32\x06.Value\"\x10\n\x0ePutKeyResponse\"\"\n\rGetKeyRequest\x12\x11\n\x03key\x18\x01 \x01(\x0b\x32\x04.Key\"%\n\x0eGetKeyResponse\x12\x13\n\x03val\x18\x01 \x01(\x0b\x32\x06.Value\"\x14\n\x04Node\x12\x0c\n\x04ipv4\x18\x01 \x01(\x07\"\x12\n\x03Key\x12\x0b\n\x03key\x18\x01 \x01(\t\"\x16\n\x05Value\x12\r\n\x05value\x18\x01 \x01(\t2{\n\x05\x43hord\x12)\n\x06PutKey\x12\x0e.GetKeyRequest\x1a\x0f.PutKeyResponse\x12)\n\x06GetKey\x12\x0e.PutKeyRequest\x1a\x0f.GetKeyResponse\x12\x1c\n\rFindSuccessor\x12\x04.Key\x1a\x05.Nodeb\x06proto3'
+  serialized_pb=b'\n\x0b\x63hord.proto\"-\n\x16GetPredecessorResponse\x12\x13\n\x04node\x18\x01 \x01(\x0b\x32\x05.Node\"7\n\rPutKeyRequest\x12\x11\n\x03key\x18\x01 \x01(\x0b\x32\x04.Key\x12\x13\n\x03val\x18\x02 \x01(\x0b\x32\x06.Value\"\x10\n\x0ePutKeyResponse\"\"\n\rGetKeyRequest\x12\x11\n\x03key\x18\x01 \x01(\x0b\x32\x04.Key\"%\n\x0eGetKeyResponse\x12\x13\n\x03val\x18\x01 \x01(\x0b\x32\x06.Value\"\x1e\n\x04Node\x12\n\n\x02ip\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x01(\r\"\x12\n\x03Key\x12\x0b\n\x03key\x18\x01 \x01(\r\"\x16\n\x05Value\x12\r\n\x05value\x18\x01 \x01(\t\"\x07\n\x05\x45mpty2\xc7\x01\n\x05\x43hord\x12)\n\x06PutKey\x12\x0e.GetKeyRequest\x1a\x0f.PutKeyResponse\x12)\n\x06GetKey\x12\x0e.PutKeyRequest\x1a\x0f.GetKeyResponse\x12\x1c\n\rFindSuccessor\x12\x04.Key\x1a\x05.Node\x12\x17\n\x06Notify\x12\x05.Node\x1a\x06.Empty\x12\x31\n\x0eGetPredecessor\x12\x06.Empty\x1a\x17.GetPredecessorResponseb\x06proto3'
 )
 
 
+
+
+_GETPREDECESSORRESPONSE = _descriptor.Descriptor(
+  name='GetPredecessorResponse',
+  full_name='GetPredecessorResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='node', full_name='GetPredecessorResponse.node', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=15,
+  serialized_end=60,
+)
 
 
 _PUTKEYREQUEST = _descriptor.Descriptor(
@@ -57,8 +88,8 @@ _PUTKEYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=15,
-  serialized_end=70,
+  serialized_start=62,
+  serialized_end=117,
 )
 
 
@@ -81,8 +112,8 @@ _PUTKEYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=72,
-  serialized_end=88,
+  serialized_start=119,
+  serialized_end=135,
 )
 
 
@@ -112,8 +143,8 @@ _GETKEYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=90,
-  serialized_end=124,
+  serialized_start=137,
+  serialized_end=171,
 )
 
 
@@ -143,8 +174,8 @@ _GETKEYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=126,
-  serialized_end=163,
+  serialized_start=173,
+  serialized_end=210,
 )
 
 
@@ -156,8 +187,15 @@ _NODE = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='ipv4', full_name='Node.ipv4', index=0,
-      number=1, type=7, cpp_type=3, label=1,
+      name='ip', full_name='Node.ip', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='id', full_name='Node.id', index=1,
+      number=2, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -174,8 +212,8 @@ _NODE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=165,
-  serialized_end=185,
+  serialized_start=212,
+  serialized_end=242,
 )
 
 
@@ -188,8 +226,8 @@ _KEY = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='key', full_name='Key.key', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
+      number=1, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -205,8 +243,8 @@ _KEY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=187,
-  serialized_end=205,
+  serialized_start=244,
+  serialized_end=262,
 )
 
 
@@ -236,14 +274,40 @@ _VALUE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=207,
-  serialized_end=229,
+  serialized_start=264,
+  serialized_end=286,
 )
 
+
+_EMPTY = _descriptor.Descriptor(
+  name='Empty',
+  full_name='Empty',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=288,
+  serialized_end=295,
+)
+
+_GETPREDECESSORRESPONSE.fields_by_name['node'].message_type = _NODE
 _PUTKEYREQUEST.fields_by_name['key'].message_type = _KEY
 _PUTKEYREQUEST.fields_by_name['val'].message_type = _VALUE
 _GETKEYREQUEST.fields_by_name['key'].message_type = _KEY
 _GETKEYRESPONSE.fields_by_name['val'].message_type = _VALUE
+DESCRIPTOR.message_types_by_name['GetPredecessorResponse'] = _GETPREDECESSORRESPONSE
 DESCRIPTOR.message_types_by_name['PutKeyRequest'] = _PUTKEYREQUEST
 DESCRIPTOR.message_types_by_name['PutKeyResponse'] = _PUTKEYRESPONSE
 DESCRIPTOR.message_types_by_name['GetKeyRequest'] = _GETKEYREQUEST
@@ -251,7 +315,15 @@ DESCRIPTOR.message_types_by_name['GetKeyResponse'] = _GETKEYRESPONSE
 DESCRIPTOR.message_types_by_name['Node'] = _NODE
 DESCRIPTOR.message_types_by_name['Key'] = _KEY
 DESCRIPTOR.message_types_by_name['Value'] = _VALUE
+DESCRIPTOR.message_types_by_name['Empty'] = _EMPTY
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
+
+GetPredecessorResponse = _reflection.GeneratedProtocolMessageType('GetPredecessorResponse', (_message.Message,), {
+  'DESCRIPTOR' : _GETPREDECESSORRESPONSE,
+  '__module__' : 'chord_pb2'
+  # @@protoc_insertion_point(class_scope:GetPredecessorResponse)
+  })
+_sym_db.RegisterMessage(GetPredecessorResponse)
 
 PutKeyRequest = _reflection.GeneratedProtocolMessageType('PutKeyRequest', (_message.Message,), {
   'DESCRIPTOR' : _PUTKEYREQUEST,
@@ -302,6 +374,13 @@ Value = _reflection.GeneratedProtocolMessageType('Value', (_message.Message,), {
   })
 _sym_db.RegisterMessage(Value)
 
+Empty = _reflection.GeneratedProtocolMessageType('Empty', (_message.Message,), {
+  'DESCRIPTOR' : _EMPTY,
+  '__module__' : 'chord_pb2'
+  # @@protoc_insertion_point(class_scope:Empty)
+  })
+_sym_db.RegisterMessage(Empty)
+
 
 
 _CHORD = _descriptor.ServiceDescriptor(
@@ -310,8 +389,8 @@ _CHORD = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=231,
-  serialized_end=354,
+  serialized_start=298,
+  serialized_end=497,
   methods=[
   _descriptor.MethodDescriptor(
     name='PutKey',
@@ -338,6 +417,24 @@ _CHORD = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_KEY,
     output_type=_NODE,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='Notify',
+    full_name='Chord.Notify',
+    index=3,
+    containing_service=None,
+    input_type=_NODE,
+    output_type=_EMPTY,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='GetPredecessor',
+    full_name='Chord.GetPredecessor',
+    index=4,
+    containing_service=None,
+    input_type=_EMPTY,
+    output_type=_GETPREDECESSORRESPONSE,
     serialized_options=None,
   ),
 ])

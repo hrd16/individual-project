@@ -28,6 +28,16 @@ class ChordStub(object):
                 request_serializer=chord__pb2.Key.SerializeToString,
                 response_deserializer=chord__pb2.Node.FromString,
                 )
+        self.Notify = channel.unary_unary(
+                '/Chord/Notify',
+                request_serializer=chord__pb2.Node.SerializeToString,
+                response_deserializer=chord__pb2.Empty.FromString,
+                )
+        self.GetPredecessor = channel.unary_unary(
+                '/Chord/GetPredecessor',
+                request_serializer=chord__pb2.Empty.SerializeToString,
+                response_deserializer=chord__pb2.GetPredecessorResponse.FromString,
+                )
 
 
 class ChordServicer(object):
@@ -51,6 +61,18 @@ class ChordServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def Notify(self, request, context):
+        """Missing associated documentation comment in .proto file"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetPredecessor(self, request, context):
+        """Missing associated documentation comment in .proto file"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ChordServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -68,6 +90,16 @@ def add_ChordServicer_to_server(servicer, server):
                     servicer.FindSuccessor,
                     request_deserializer=chord__pb2.Key.FromString,
                     response_serializer=chord__pb2.Node.SerializeToString,
+            ),
+            'Notify': grpc.unary_unary_rpc_method_handler(
+                    servicer.Notify,
+                    request_deserializer=chord__pb2.Node.FromString,
+                    response_serializer=chord__pb2.Empty.SerializeToString,
+            ),
+            'GetPredecessor': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetPredecessor,
+                    request_deserializer=chord__pb2.Empty.FromString,
+                    response_serializer=chord__pb2.GetPredecessorResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -124,5 +156,37 @@ class Chord(object):
         return grpc.experimental.unary_unary(request, target, '/Chord/FindSuccessor',
             chord__pb2.Key.SerializeToString,
             chord__pb2.Node.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Notify(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Chord/Notify',
+            chord__pb2.Node.SerializeToString,
+            chord__pb2.Empty.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetPredecessor(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Chord/GetPredecessor',
+            chord__pb2.Empty.SerializeToString,
+            chord__pb2.GetPredecessorResponse.FromString,
             options, channel_credentials,
             call_credentials, compression, wait_for_ready, timeout, metadata)
