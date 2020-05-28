@@ -12,10 +12,6 @@ service Chord {
     rpc GetPredecessor (Empty) returns (Node);
 }
 
-message GetPredecessorResponse {
-    Node node = 1;
-}
-
 message PutKeyRequest {
     Key key = 1;
     Value val = 2;

@@ -6,3 +6,6 @@ server:
   dropRate: 0
   network: create_star(network)
   events: []
+client:
+  replicas: 1
+  command: python client.py

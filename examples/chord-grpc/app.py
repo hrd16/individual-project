@@ -192,6 +192,7 @@ def serve(chord_server, port):
     chord_pb2_grpc.add_ChordServicer_to_server(chord_server, server)
     server.add_insecure_port(f'[::]:{port}')
     server.start()
+    time.sleep(2)
     # server.wait_for_termination()
     return server
 
@@ -213,6 +214,7 @@ if __name__ == '__main__':
     logger.info(nodes)
 
     if idx == 0:
+        time.sleep(5)
         chord_server = ChordServer(hostname, idx)
     else:
         time.sleep(10)
@@ -232,20 +234,5 @@ if __name__ == '__main__':
     stabilize_thread = threading.Thread(target=stabilize)
     chord_server.join(chord_pb2.Node(ip=nodes[0]) if idx > 0 else None)
     stabilize_thread.start()
-
-    if idx == 0:
-        time.sleep(20)
-        logger.info('Putting')
-        channel = grpc.insecure_channel(f'{chord_server.node.ip}:{PROXY_PORT}')
-        stub = chord_pb2_grpc.ChordStub(channel)
-        stub.PutKey(chord_pb2.PutKeyRequest(key=chord_pb2.Key(id=idx), val=chord_pb2.Value(value=b'hello world')))
-
-        time.sleep(5)
-
-        logger.info('Getting')
-        channel = grpc.insecure_channel(f'{chord_server.node.ip}:{PROXY_PORT}')
-        stub = chord_pb2_grpc.ChordStub(channel)
-        res = stub.GetKey(chord_pb2.GetKeyRequest(key=chord_pb2.Key(id=idx)))
-        logger.info(f'Get result {res.val.value}')
 
     server.wait_for_termination()
