@@ -1,6 +1,6 @@
 runtime: python
 server:
-  replicas: 3
+  replicas: 5
   command: python app.py
   latency: 0
   dropRate: 0

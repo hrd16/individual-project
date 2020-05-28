@@ -6,9 +6,10 @@ service Chord {
     rpc GetKey (PutKeyRequest) returns (GetKeyResponse);
 
     // Protocol level
+    rpc Ping (Empty) returns (Empty);
     rpc FindSuccessor (Key) returns (Node);
     rpc Notify (Node) returns (Empty);
-    rpc GetPredecessor (Empty) returns (GetPredecessorResponse);
+    rpc GetPredecessor (Empty) returns (Node);
 }
 
 message GetPredecessorResponse {

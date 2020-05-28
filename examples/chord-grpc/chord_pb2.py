@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x0b\x63hord.proto\"-\n\x16GetPredecessorResponse\x12\x13\n\x04node\x18\x01 \x01(\x0b\x32\x05.Node\"7\n\rPutKeyRequest\x12\x11\n\x03key\x18\x01 \x01(\x0b\x32\x04.Key\x12\x13\n\x03val\x18\x02 \x01(\x0b\x32\x06.Value\"\x10\n\x0ePutKeyResponse\"\"\n\rGetKeyRequest\x12\x11\n\x03key\x18\x01 \x01(\x0b\x32\x04.Key\"%\n\x0eGetKeyResponse\x12\x13\n\x03val\x18\x01 \x01(\x0b\x32\x06.Value\"\x1e\n\x04Node\x12\n\n\x02ip\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x01(\r\"\x12\n\x03Key\x12\x0b\n\x03key\x18\x01 \x01(\r\"\x16\n\x05Value\x12\r\n\x05value\x18\x01 \x01(\t\"\x07\n\x05\x45mpty2\xc7\x01\n\x05\x43hord\x12)\n\x06PutKey\x12\x0e.GetKeyRequest\x1a\x0f.PutKeyResponse\x12)\n\x06GetKey\x12\x0e.PutKeyRequest\x1a\x0f.GetKeyResponse\x12\x1c\n\rFindSuccessor\x12\x04.Key\x1a\x05.Node\x12\x17\n\x06Notify\x12\x05.Node\x1a\x06.Empty\x12\x31\n\x0eGetPredecessor\x12\x06.Empty\x1a\x17.GetPredecessorResponseb\x06proto3'
+  serialized_pb=b'\n\x0b\x63hord.proto\"-\n\x16GetPredecessorResponse\x12\x13\n\x04node\x18\x01 \x01(\x0b\x32\x05.Node\"7\n\rPutKeyRequest\x12\x11\n\x03key\x18\x01 \x01(\x0b\x32\x04.Key\x12\x13\n\x03val\x18\x02 \x01(\x0b\x32\x06.Value\"\x10\n\x0ePutKeyResponse\"\"\n\rGetKeyRequest\x12\x11\n\x03key\x18\x01 \x01(\x0b\x32\x04.Key\"%\n\x0eGetKeyResponse\x12\x13\n\x03val\x18\x01 \x01(\x0b\x32\x06.Value\"\x1e\n\x04Node\x12\n\n\x02ip\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x01(\r\"\x12\n\x03Key\x12\x0b\n\x03key\x18\x01 \x01(\r\"\x16\n\x05Value\x12\r\n\x05value\x18\x01 \x01(\t\"\x07\n\x05\x45mpty2\xcd\x01\n\x05\x43hord\x12)\n\x06PutKey\x12\x0e.GetKeyRequest\x1a\x0f.PutKeyResponse\x12)\n\x06GetKey\x12\x0e.PutKeyRequest\x1a\x0f.GetKeyResponse\x12\x16\n\x04Ping\x12\x06.Empty\x1a\x06.Empty\x12\x1c\n\rFindSuccessor\x12\x04.Key\x1a\x05.Node\x12\x17\n\x06Notify\x12\x05.Node\x1a\x06.Empty\x12\x1f\n\x0eGetPredecessor\x12\x06.Empty\x1a\x05.Nodeb\x06proto3'
 )
 
 
@@ -390,7 +390,7 @@ _CHORD = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   serialized_start=298,
-  serialized_end=497,
+  serialized_end=503,
   methods=[
   _descriptor.MethodDescriptor(
     name='PutKey',
@@ -411,9 +411,18 @@ _CHORD = _descriptor.ServiceDescriptor(
     serialized_options=None,
   ),
   _descriptor.MethodDescriptor(
+    name='Ping',
+    full_name='Chord.Ping',
+    index=2,
+    containing_service=None,
+    input_type=_EMPTY,
+    output_type=_EMPTY,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
     name='FindSuccessor',
     full_name='Chord.FindSuccessor',
-    index=2,
+    index=3,
     containing_service=None,
     input_type=_KEY,
     output_type=_NODE,
@@ -422,7 +431,7 @@ _CHORD = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='Notify',
     full_name='Chord.Notify',
-    index=3,
+    index=4,
     containing_service=None,
     input_type=_NODE,
     output_type=_EMPTY,
@@ -431,10 +440,10 @@ _CHORD = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='GetPredecessor',
     full_name='Chord.GetPredecessor',
-    index=4,
+    index=5,
     containing_service=None,
     input_type=_EMPTY,
-    output_type=_GETPREDECESSORRESPONSE,
+    output_type=_NODE,
     serialized_options=None,
   ),
 ])

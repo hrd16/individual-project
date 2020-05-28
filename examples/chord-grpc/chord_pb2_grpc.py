@@ -23,6 +23,11 @@ class ChordStub(object):
                 request_serializer=chord__pb2.PutKeyRequest.SerializeToString,
                 response_deserializer=chord__pb2.GetKeyResponse.FromString,
                 )
+        self.Ping = channel.unary_unary(
+                '/Chord/Ping',
+                request_serializer=chord__pb2.Empty.SerializeToString,
+                response_deserializer=chord__pb2.Empty.FromString,
+                )
         self.FindSuccessor = channel.unary_unary(
                 '/Chord/FindSuccessor',
                 request_serializer=chord__pb2.Key.SerializeToString,
@@ -36,7 +41,7 @@ class ChordStub(object):
         self.GetPredecessor = channel.unary_unary(
                 '/Chord/GetPredecessor',
                 request_serializer=chord__pb2.Empty.SerializeToString,
-                response_deserializer=chord__pb2.GetPredecessorResponse.FromString,
+                response_deserializer=chord__pb2.Node.FromString,
                 )
 
 
@@ -44,13 +49,21 @@ class ChordServicer(object):
     """Missing associated documentation comment in .proto file"""
 
     def PutKey(self, request, context):
-        """Missing associated documentation comment in .proto file"""
+        """Application level
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def GetKey(self, request, context):
         """Missing associated documentation comment in .proto file"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def Ping(self, request, context):
+        """Protocol level
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -86,6 +99,11 @@ def add_ChordServicer_to_server(servicer, server):
                     request_deserializer=chord__pb2.PutKeyRequest.FromString,
                     response_serializer=chord__pb2.GetKeyResponse.SerializeToString,
             ),
+            'Ping': grpc.unary_unary_rpc_method_handler(
+                    servicer.Ping,
+                    request_deserializer=chord__pb2.Empty.FromString,
+                    response_serializer=chord__pb2.Empty.SerializeToString,
+            ),
             'FindSuccessor': grpc.unary_unary_rpc_method_handler(
                     servicer.FindSuccessor,
                     request_deserializer=chord__pb2.Key.FromString,
@@ -99,7 +117,7 @@ def add_ChordServicer_to_server(servicer, server):
             'GetPredecessor': grpc.unary_unary_rpc_method_handler(
                     servicer.GetPredecessor,
                     request_deserializer=chord__pb2.Empty.FromString,
-                    response_serializer=chord__pb2.GetPredecessorResponse.SerializeToString,
+                    response_serializer=chord__pb2.Node.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -140,6 +158,22 @@ class Chord(object):
         return grpc.experimental.unary_unary(request, target, '/Chord/GetKey',
             chord__pb2.PutKeyRequest.SerializeToString,
             chord__pb2.GetKeyResponse.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Ping(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Chord/Ping',
+            chord__pb2.Empty.SerializeToString,
+            chord__pb2.Empty.FromString,
             options, channel_credentials,
             call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -187,6 +221,6 @@ class Chord(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/Chord/GetPredecessor',
             chord__pb2.Empty.SerializeToString,
-            chord__pb2.GetPredecessorResponse.FromString,
+            chord__pb2.Node.FromString,
             options, channel_credentials,
             call_credentials, compression, wait_for_ready, timeout, metadata)
