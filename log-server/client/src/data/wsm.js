@@ -1,4 +1,5 @@
 import NodeHandler from './handlers/node'
+import MessagesHandler from './handlers/messages'
 import MetricsHandler from './handlers/metrics';
 
 const URL = 'ws://localhost:31234/api/ws';
@@ -7,10 +8,12 @@ class WSM {
     ws = new WebSocket(URL);
 
     nodeHandler = new NodeHandler();
+    messagesHandler = new MessagesHandler();
     metricsHandler = new MetricsHandler();
 
     handlers = {
         'node': this.nodeHandler,
+        'messages': this.messagesHandler,
         'metrics': this.metricsHandler
     };
 

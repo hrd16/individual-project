@@ -6,11 +6,14 @@ class Metrics extends Component {
     state = {
         metrics: this.props.metricsHandler.metrics
     }
+
+    componentDidMount() {
+        this.props.metricsHandler.subscribeToMessages(this.handleMetricsChange);
+      }
     
-    constructor(props) {
-        super(props);
-        props.metricsHandler.subscribeToMetrics(this.handleMetricsChange);
-    }
+      componentWillUnmount() {
+        this.props.metricsHandler.unsubscribeToMessages(this.handleMetricsChange);
+      }
 
     handleMetricsChange = (metrics) => {
         this.setState(state => ({...state, metrics: metrics}))

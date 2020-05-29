@@ -34,11 +34,11 @@ func main() {
 	dropRate, _ := strconv.ParseFloat(os.Args[4], 64)
 	clientReplicas, _ := strconv.Atoi(os.Args[5])
 
-	fmt.Printf("Replicas: %d\n", replicas)
-	fmt.Printf("Namespace: %s\n", namespace)
-	fmt.Printf("Latency: %d\n", latency)
-	fmt.Printf("Drop rate: %f\n", dropRate)
-	fmt.Printf("Client replicas: %d\n", clientReplicas)
+	log.Printf("Replicas: %d\n", replicas)
+	log.Printf("Namespace: %s\n", namespace)
+	log.Printf("Latency: %d\n", latency)
+	log.Printf("Drop rate: %f\n", dropRate)
+	log.Printf("Client replicas: %d\n", clientReplicas)
 
 	lookup := make(map[string]string)
 
@@ -46,7 +46,7 @@ func main() {
 		addr := fmt.Sprintf("app-%d.app-service.%s.svc.cluster.local", i, namespace)
 		ips, err := net.LookupIP(addr)
 		if err != nil {
-			fmt.Printf("Could not get IPs: %v\n", err)
+			log.Printf("Could not get IPs: %v\n", err)
 			time.Sleep(time.Millisecond * 100)
 		} else {
 			lookup[ips[0].String()] = addr
@@ -58,7 +58,7 @@ func main() {
 		addr := fmt.Sprintf("client-%d.client-service.%s.svc.cluster.local", i, namespace)
 		ips, err := net.LookupIP(addr)
 		if err != nil {
-			fmt.Printf("Could not get IPs: %v\n", err)
+			log.Printf("Could not get IPs: %v\n", err)
 			time.Sleep(time.Millisecond * 100)
 		} else {
 			lookup[ips[0].String()] = addr
@@ -66,7 +66,7 @@ func main() {
 		}
 	}
 
-	fmt.Println(lookup)
+	log.Println(lookup)
 
 	origin, _ := url.Parse("http://127.0.0.1:10002")
 

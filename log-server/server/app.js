@@ -20,7 +20,7 @@ server.on('request', app);
 app.use(express.static('../client/build'));
 
 let handler = new Handler();
-//handler.subscribe('app', msg => console.debug(msg));
+// handler.subscribe('proxy', msg => console.debug(msg));
 
 require('./modules/ws.js')(handler, server);
 require('./modules/filesys.js')(handler);

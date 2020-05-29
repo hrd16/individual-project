@@ -14,8 +14,10 @@ module.exports = function (handler, server) {
     const wss = new WebSocket.Server({ server: server, path: '/api/ws' });
 
     let app_logs = [];
+    let proxy_logs = [];
     let received = {};
 
+    // Send node logs
     handler.subscribe('app', msgs => {
         app_logs = app_logs.concat(msgs);
         wss.clients.forEach(client => {
@@ -23,12 +25,21 @@ module.exports = function (handler, server) {
         });
     });
 
-    handler.subscribe('app', msgs => { 
+    // Send message logs
+    handler.subscribe('proxy', msgs => {
+        proxy_logs = proxy_logs.concat(msgs);
+        wss.clients.forEach(client => {
+            client.send(JSON.stringify({type: 'messages', val: msgs}));
+        });
+    });
+
+    // Send metrics
+    handler.subscribe('proxy', msgs => { 
         msgs.forEach(msg => {
-            if (!(msg.node in received)) {
-                received[msg.node] = 0;
+            if (!(msg.to in received)) {
+                received[msg.to] = 0;
             }
-            received[msg.node]++;
+            received[msg.to]++;
         });
         wss.clients.forEach(client => {
             client.send(JSON.stringify({type: 'metrics', val: get_metrics(received)}));
@@ -37,6 +48,7 @@ module.exports = function (handler, server) {
 
     wss.on('connection', function connection(ws) {
         ws.send(JSON.stringify({type: 'node', val: app_logs}));
+        ws.send(JSON.stringify({type: 'messages', val: proxy_logs}));
         ws.send(JSON.stringify({type: 'metrics', val: get_metrics(received)}));
     });
 };

@@ -8,7 +8,7 @@ module.exports = function (handler, namespace) {
 
     router.use(bodyParser.text( { type: 'application/x-ndjson', limit: '50mb' } ));
 
-    function log(tag) {
+    function log(tag, msg_func=(msg => false)) {
         router.post(`/${tag}`, function (req, res) {
             let msgs = [];
 
@@ -24,6 +24,12 @@ module.exports = function (handler, namespace) {
 
                     let pod_name = record.kubernetes.pod_name;
                     let msg = {timestamp: record.timestamp, node: pod_name, msg: record.log};
+                    
+                    let skip = msg_func(msg);
+                    if (skip) {
+                      return;
+                    }
+
                     msgs.push(msg);
                 })
                 .on('end', () => {
@@ -35,7 +41,19 @@ module.exports = function (handler, namespace) {
     }
 
     log('app');
-    log('proxy');
+    log('proxy', msg => {
+      if (msg.msg.substring(0, 1) !== '{') {
+        return true;
+      }
+      let data = JSON.parse(msg.msg); 
+
+      delete msg.msg;
+      delete msg.node;
+
+      for (let key of Object.keys(data)) {
+        msg[key] = data[key];
+      }
+    });
 
     return router;
 };

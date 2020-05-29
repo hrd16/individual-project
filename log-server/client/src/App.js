@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import Log from './components/Log'
 import { Layout, Spin } from 'antd';
 import { MemoryRouter as Router, Switch, Route } from 'react-router-dom'
 import axios from 'axios';
 import './App.css';
 import LinkMenu from './components/LinkMenu';
+import Node from './components/Node'
+import Messages from './components/Messages'
 import Metrics from './components/Metrics';
 import WSM from './data/wsm';
 import Dashboard from './components/Dashboard';
@@ -41,11 +42,11 @@ class App extends Component {
           </Route>
 
           <Route exact path="/nodes">
-            <Log nodeHandler={this.wsm.nodeHandler} config={this.state.config} />
+            <Node nodeHandler={this.wsm.nodeHandler} config={this.state.config} />
           </Route>
 
           <Route exact path="/messages">
-            
+            <Messages messagesHandler={this.wsm.messagesHandler} config={this.state.config} />
           </Route>
 
           <Route exact path="/metrics">

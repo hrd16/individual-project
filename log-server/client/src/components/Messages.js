@@ -5,19 +5,43 @@ import { SearchOutlined } from '@ant-design/icons';
 
 var dateFormat = require('dateformat');
 
-class Log extends Component {
+class Messages extends Component {
 
   state = {
-    messages: this.props.nodeHandler.messages
+    messages: this.props.messagesHandler.messages
   }
 
-  constructor(props) {
-    super(props);
-    props.nodeHandler.subscribeToMessages(this.handleMessagesChange);
+  componentDidMount() {
+    this.props.messagesHandler.subscribeToMessages(this.handleMessagesChange);
+  }
+
+  componentWillUnmount() {
+    this.props.messagesHandler.unsubscribeToMessages(this.handleMessagesChange);
   }
 
   handleMessagesChange = (messages) => {
     this.setState(state => ({...state, messages: messages}))
+  }
+
+  getFilters = (clients) => {
+    let filters = [];
+
+    filters = filters.concat(Array.from(Array(this.props.config.params.server.replicas).keys()).map(i => {
+      return {
+        text: `app-${i}`,
+        value: `app-${i}`
+      };
+    }));
+
+    if (clients && this.props.config.params.client !== undefined) {
+      filters = filters.concat(Array.from(Array(this.props.config.params.client.replicas).keys()).map(i => {
+        return {
+          text: `client-${i}`,
+          value: `client-${i}`
+        };
+      }));
+    }
+    return filters;
   }
 
   getColumnSearchProps = dataIndex => ({
@@ -83,58 +107,51 @@ class Log extends Component {
     clearFilters();
     this.setState({ searchText: '' });
   };
-
+  
+  columns = [
+    {
+      title: 'Timestamp',
+      dataIndex: 'timestamp',
+      width: 175,
+      render: (t, r, i) => dateFormat(new Date(parseInt(r.timestamp)), "H:MM:ss.l"),
+      defaultSortOrder: 'descend',
+      sorter: (a, b) => a.timestamp - b.timestamp,
+    },
+    {
+      title: 'From',
+      dataIndex: 'from',
+      width: 175,
+      filters: this.getFilters(true),
+      onFilter: (value, record) => record.from === value,
+    },
+    {
+      title: 'To',
+      dataIndex: 'to',
+      width: 175,
+      filters: this.getFilters(false),
+      onFilter: (value, record) => record.to === value,
+    },
+    {
+      title: 'Path',
+      dataIndex: 'path',
+      ...this.getColumnSearchProps('path')
+    },
+  ];
 
   render() {
-    const columns = [
-      {
-        title: 'Timestamp',
-        dataIndex: 'timestamp',
-        width: 175,
-        render: (t, r, i) => dateFormat(new Date(parseInt(r.timestamp)), "H:MM:ss.l"),
-        defaultSortOrder: 'descend',
-        sorter: (a, b) => a.timestamp - b.timestamp,
-      },
-      {
-        title: 'Node',
-        dataIndex: 'node',
-        width: 175,
-        filters: Array.from(Array(this.props.config.params.server.replicas).keys()).map(i => {
-          return {
-            text: `app-${i}`,
-            value: `app-${i}`
-          };
-        }),
-        // [
-        //   {
-        //     text: 'app-0',
-        //     value: 'app-0'
-        //   },
-        //   {
-        //     text: 'app-1',
-        //     value: 'app-1'
-        //   },
-        //   {
-        //     text: 'app-2',
-        //     value: 'app-2'
-        //   }
-        // ]  
-        onFilter: (value, record) => record.node === value,
-      },
-      {
-        title: 'Output',
-        dataIndex: 'msg',
-        ...this.getColumnSearchProps('msg')
-      },
-    ];
-
     return (
       <div>
-        <Table dataSource={this.state.messages} columns={columns} pagination={{ pageSize: 50 }} />
+        <Table 
+          dataSource={this.state.messages}
+          components={{body: {key: this.state.messages.length}}}
+          columns={this.columns} 
+          pagination={{ pageSize: 50 }} 
+          rowKey={record => record.key + this.state.messages.length * this.state.messages.length}
+        />
       </div>
     )
   }
 
 }
 
-export default Log;
+export default Messages;

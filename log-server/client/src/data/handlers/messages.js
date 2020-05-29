@@ -1,19 +1,17 @@
-class MetricsHandler {
+class MessageHandler {
 
-    metrics = [];
+    messages = [];
     listeners = [];
 
     onMessage(data) {
-        const metrics = data.val;
+        const msgs = data.val;
 
-        for (let i = 0; i < metrics.length; i++) {
-          metrics[i].key = i;
-        }
-
-        this.metrics = metrics;
+        msgs.forEach(msg => {
+            this.messages.push({key: this.messages.length, ...msg});
+        });
 
         this.listeners.forEach(handler => {
-            handler(this.metrics);
+            handler(this.messages);
         });
     }
 
@@ -27,4 +25,4 @@ class MetricsHandler {
 
 }
 
-export default MetricsHandler;
+export default MessageHandler;
