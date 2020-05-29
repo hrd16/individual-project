@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -11,20 +12,33 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"regexp"
 	"strconv"
 	"time"
 )
 
+type LogMessage struct {
+	From    string `json:"from"`
+	To      string `json:"to"`
+	Path    string `json:"path"`
+	Dropped bool   `json:"dropped"`
+	Latency int    `json:"latency"`
+}
+
 func main() {
+	log.SetFlags(0)
+
 	replicas, _ := strconv.Atoi(os.Args[1])
 	namespace := os.Args[2]
 	latency, _ := strconv.Atoi(os.Args[3])
 	dropRate, _ := strconv.ParseFloat(os.Args[4], 64)
+	clientReplicas, _ := strconv.Atoi(os.Args[5])
 
 	fmt.Printf("Replicas: %d\n", replicas)
 	fmt.Printf("Namespace: %s\n", namespace)
 	fmt.Printf("Latency: %d\n", latency)
 	fmt.Printf("Drop rate: %f\n", dropRate)
+	fmt.Printf("Client replicas: %d\n", clientReplicas)
 
 	lookup := make(map[string]string)
 
@@ -33,7 +47,18 @@ func main() {
 		ips, err := net.LookupIP(addr)
 		if err != nil {
 			fmt.Printf("Could not get IPs: %v\n", err)
-			i = 0
+			time.Sleep(time.Millisecond * 100)
+		} else {
+			lookup[ips[0].String()] = addr
+			i++
+		}
+	}
+
+	for i := 0; i < clientReplicas; {
+		addr := fmt.Sprintf("client-%d.client-service.%s.svc.cluster.local", i, namespace)
+		ips, err := net.LookupIP(addr)
+		if err != nil {
+			fmt.Printf("Could not get IPs: %v\n", err)
 			time.Sleep(time.Millisecond * 100)
 		} else {
 			lookup[ips[0].String()] = addr
@@ -54,6 +79,8 @@ func main() {
 
 	proxy := &httputil.ReverseProxy{Director: director}
 
+	rgx, _ := regexp.Compile("^([^.]+)")
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -65,11 +92,23 @@ func main() {
 		r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 
 		xfwd := r.Header.Get("X-Forwarded-For")
-		log.Printf("%s - %s\n", r.URL.Path, lookup[xfwd])
+		shouldDrop := rand.Float64() < dropRate
+
+		logMessage := LogMessage{
+			From:    rgx.FindString(lookup[xfwd]),
+			To:      rgx.FindString(r.Host),
+			Path:    r.URL.Path,
+			Dropped: shouldDrop,
+			Latency: latency,
+		}
+
+		b, _ := json.Marshal(logMessage)
+		logStr := string(b)
+		log.Printf("%s\n", logStr)
 
 		time.Sleep(time.Duration(latency) * time.Millisecond)
 
-		if rand.Float64() < dropRate {
+		if shouldDrop {
 			return
 		}
 

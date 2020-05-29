@@ -1,0 +1,1 @@
+docker build -t goproxy:1.0 .

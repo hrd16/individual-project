@@ -138,12 +138,13 @@ def create_client_deployment(api_client, namespace, config, server_config):
     # Deploy
     api_client.create_namespaced_stateful_set(body=deployment, namespace=namespace)
 
-def create_app_deployment(api_client, namespace, config):
-    replicas = config['replicas']
-    command = config['command']
-    latency = config.get('latency', 0)
-    dropRate = config.get('dropRate', 0)
-    network = shlex.quote(config['network'])
+def create_app_deployment(api_client, namespace, server_config, client_config):
+    replicas = server_config['replicas']
+    command = server_config['command']
+    latency = server_config.get('latency', 0)
+    dropRate = server_config.get('dropRate', 0)
+    network = shlex.quote(server_config['network'])
+    client_replicas = client_config.get('replicas', 0)
 
     # Volume
     volume = client.V1Volume(name='configvol')
@@ -178,8 +179,8 @@ def create_app_deployment(api_client, namespace, config):
     haproxy_container_spec = client.V1Container(name="haproxy", image="app-haproxy:1.0")
 
     # App Proxy Container
-    app_proxy_container_spec = client.V1Container(name="goproxy", image="app-proxy:1.0", 
-        args=[str(replicas), "$(POD_NAMESPACE)", str(latency), str(dropRate)], env=[pod_ns_env])
+    app_proxy_container_spec = client.V1Container(name="goproxy", image="goproxy:1.0", 
+        args=[str(replicas), "$(POD_NAMESPACE)", str(latency), str(dropRate), str(client_replicas)], env=[pod_ns_env])
 
     # Pod
     pod_spec = client.V1PodSpec(termination_grace_period_seconds=10, 
@@ -238,7 +239,7 @@ if __name__ == "__main__":
     create_service(core_v1, namespace, "app-service.yaml")
 
     print('Create app deployment')
-    create_app_deployment(apps_v1, namespace, sim_config['server'])
+    create_app_deployment(apps_v1, namespace, sim_config['server'], sim_config.get('client', None))
 
     if 'client' in sim_config:
         print('Create client service')
