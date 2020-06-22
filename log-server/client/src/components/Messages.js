@@ -132,9 +132,20 @@ class Messages extends Component {
       onFilter: (value, record) => record.to === value,
     },
     {
-      title: 'Path',
+      title: 'Type',
       dataIndex: 'path',
       ...this.getColumnSearchProps('path')
+    },
+    {
+      title: 'Dropped',
+      dataIndex: 'dropped',
+      width: 175,
+      render: (t, r, i) => (r.dropped.toString()),
+    },
+    {
+      title: 'Latency',
+      dataIndex: 'latency',
+      width: 175,
     },
   ];
 
